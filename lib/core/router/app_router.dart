@@ -43,7 +43,7 @@ class AppRoutes {
 }
 
 class AppRouter {
-  static final GoRouter router = GoRouter(
+  static GoRouter create() => GoRouter(
     initialLocation: AppRoutes.splash,
     routes: [
       GoRoute(
