@@ -57,63 +57,70 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(0),
-                    child: Column(
-                      children: [
-                        Watch(
-                          (context) {
-                            final value = _controller.pageIndex.value;
-                            return Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: List.generate(
-                                _controller.pages.length,
-                                (index) => AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: value == index ? 20 : 8,
-                                  height: 8,
-                                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                                  decoration: BoxDecoration(
-                                    color: value == index
-                                        ? Theme.of(context).colorScheme.primary
-                                        : Theme.of(context)
-                                            .colorScheme
-                                            .primary
-                                            .withValues(alpha: 0.2),
-                                    borderRadius: BorderRadius.circular(4),
+                  SafeArea(
+                    top: true,
+                    bottom: true,
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                        left: 16,
+                        right: 16,
+                        bottom: 16,
+                      ),
+                      child: Column(
+                        children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Watch(
+                              (context) {
+                                final value = _controller.pageIndex.value;
+                                return Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(color: Colors.white,borderRadius: BorderRadius.circular(100)),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: List.generate(
+                                      _controller.pages.length,
+                                      (index) => AnimatedContainer(
+                                        duration: const Duration(milliseconds: 200),
+                                        width: value == index ? 20 : 8,
+                                        height: 8,
+                                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                                        decoration: BoxDecoration(
+                                          color: value == index
+                                              ? Colors.black
+                                              : Color(0xffF6F7FA),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            );
-                          },
+                                );
+                              },
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         Watch(
                           (context) {
                             final value = _controller.pageIndex.value;
-                            return FilledButton(
-                              onPressed: value == _controller.pages.length - 1
+                            return _SlideToStart(
+                              label: value == _controller.pages.length - 1
+                                  ? 'Start now'
+                                  : 'Next',
+                              onComplete: value == _controller.pages.length - 1
                                   ? _finish
                                   : () => _pageController.nextPage(
                                         duration:
                                             const Duration(milliseconds: 300),
                                         curve: Curves.easeOut,
                                       ),
-                              child: Text(
-                                value == _controller.pages.length - 1
-                                    ? 'Get Started'
-                                    : 'Next',
-                              ),
                             );
                           },
                         ),
-                        const SizedBox(height: 8),
-                        Watch(
-                          (context) => _controller.isLoading.value
-                              ? const LinearProgressIndicator()
-                              : const SizedBox.shrink(),
-                        ),
-                      ],
+                      
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -134,6 +141,7 @@ class _OnboardingCard extends StatelessWidget {
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: SafeArea(
+          bottom: true,
           child: Column(
             children: [
               SizedBox(height: 55,),
@@ -155,11 +163,83 @@ class _OnboardingCard extends StatelessWidget {
         ),
       );
 
-  IconData _iconFromName(String name) => switch (name) {
-        'self_improvement' => Icons.self_improvement,
-        'tune' => Icons.tune,
-        'calendar_today' => Icons.calendar_today,
-        'air' => Icons.air,
-        _ => Icons.spa,
-      };
+}
+
+class _SlideToStart extends StatefulWidget {
+  const _SlideToStart({
+    required this.onComplete,
+    required this.label,
+  });
+
+  final Future<void> Function() onComplete;
+  final String label;
+
+  @override
+  State<_SlideToStart> createState() => _SlideToStartState();
+}
+
+class _SlideToStartState extends State<_SlideToStart> {
+  double _dragX = 0;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, constraints) {
+          const height = 64.0;
+          const thumbSize = 56.0;
+          const padding = 4.0;
+          final maxDrag = (constraints.maxWidth - thumbSize - padding * 2)
+              .clamp(0, double.infinity)
+              .toDouble();
+          final clampedDrag = _dragX.clamp(0, maxDrag);
+          return GestureDetector(
+            onHorizontalDragUpdate: (details) {
+              setState(() {
+                _dragX = (_dragX + details.delta.dx).clamp(0, maxDrag);
+              });
+            },
+            onHorizontalDragEnd: (_) async {
+              final shouldComplete = clampedDrag >= maxDrag * 0.85;
+              if (shouldComplete) {
+                await widget.onComplete();
+              }
+              if (!mounted) {
+                return;
+              }
+              setState(() => _dragX = 0);
+            },
+            child: Container(
+              height: height,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(height / 2),
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    widget.label,
+                    style:  GoogleFonts.funnelDisplay(fontSize: 16,height: 24/16,fontWeight: FontWeight.w700,color: Colors.white),
+                  ),
+                  Positioned(
+                    left: padding + clampedDrag,
+                    child: Container(
+                      width: thumbSize,
+                      height: thumbSize,
+                      decoration:  BoxDecoration(
+                        color: Color(0xFFF6F7FA).withAlpha(92),
+                        shape: BoxShape.circle,
+                      ),
+                      child:  Icon(
+                        Icons.arrow_forward,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      );
 }
