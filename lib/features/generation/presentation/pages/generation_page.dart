@@ -4,6 +4,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/tts/tts_service.dart';
 import '../../../../shared/widgets/feature_error_widget.dart';
 import '../../domain/entities/generation_options.dart';
 import '../controllers/generation_controller.dart';
@@ -19,6 +20,7 @@ class GenerationPage extends StatefulWidget {
 
 class _GenerationPageState extends State<GenerationPage> {
   late final GenerationController _controller;
+  final _isPreparingAudio = signal(false);
 
   @override
   void initState() {
@@ -48,31 +50,53 @@ class _GenerationPageState extends State<GenerationPage> {
             const SizedBox(height: 16),
             Watch(
               (context) => FilledButton(
-                onPressed: _controller.isGenerating.value
+                onPressed: _controller.isGenerating.value ||
+                        _isPreparingAudio.value
                     ? null
                     : () async {
                         final script = await _controller.generate();
                         if (!context.mounted || script == null) {
                           return;
                         }
-                        context.push(
-                          AppRoutes.player,
-                          extra: MeditationPlayerArgs(
-                            title:
-                                '${_controller.options.value.goal} Meditation',
-                            script: script,
-                            durationMinutes:
-                                _controller.options.value.durationMinutes,
+                        _isPreparingAudio.value = true;
+                        try {
+                          final source =
+                              await getIt<TtsService>().buildAudioSource(
+                            script,
+                            language: _playerLanguage,
+                            pitch: 1.0,
+                            rate: 0.6,
                             voiceStyle: _controller.options.value.voiceStyle,
-                            backgroundSound:
-                                _controller.options.value.backgroundSound,
-                          ),
-                        );
+                          );
+                          if (!context.mounted) {
+                            return;
+                          }
+                          context.push(
+                            AppRoutes.player,
+                            extra: MeditationPlayerArgs(
+                              title:
+                                  '${_controller.options.value.goal} Meditation',
+                              script: script,
+                              durationMinutes:
+                                  _controller.options.value.durationMinutes,
+                              voiceStyle: _controller.options.value.voiceStyle,
+                              backgroundSound:
+                                  _controller.options.value.backgroundSound,
+                              preloadedSource: source,
+                            ),
+                          );
+                        } catch (e) {
+                          _controller.error.value = e.toString();
+                        } finally {
+                          _isPreparingAudio.value = false;
+                        }
                       },
                 child: Text(
                   _controller.isGenerating.value
                       ? 'Generating...'
-                      : 'Generate',
+                      : _isPreparingAudio.value
+                          ? 'Preparing audio...'
+                          : 'Generate',
                 ),
               ),
             ),
@@ -80,6 +104,8 @@ class _GenerationPageState extends State<GenerationPage> {
         ),
       );
 }
+
+const _playerLanguage = 'en-US';
 
 class _OptionsSection extends StatelessWidget {
   const _OptionsSection({required this.options});

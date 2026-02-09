@@ -6,7 +6,6 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
 import '../../domain/entities/breathing_options.dart';
 import '../controllers/breathing_controller.dart';
-import 'breathing_session_page.dart';
 
 class BreathingPage extends StatefulWidget {
   const BreathingPage({super.key});

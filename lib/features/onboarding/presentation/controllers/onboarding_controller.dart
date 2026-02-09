@@ -15,24 +15,24 @@ class OnboardingController {
 
   final pages = [
     const OnboardingPageInfo(
-      title: 'Calm Your Mind',
-      description: 'Short sessions for instant clarity and relaxation.',
-      iconName: 'self_improvement',
+      title: 'Relax & Focus',
+      description: 'with AI Meditation',
+      imagePath: 'assets/images/onb_image1.png',
     ),
     const OnboardingPageInfo(
-      title: 'Personalized Goals',
-      description: 'Pick a goal and we generate a meditation for you.',
-      iconName: 'tune',
+      title: 'AI Creates',
+      description: 'Sessions for Your Mind',
+      imagePath: 'assets/images/onb_image2.png',
     ),
     const OnboardingPageInfo(
-      title: 'Daily Routine',
-      description: 'Build a gentle habit with daily routines.',
-      iconName: 'calendar_today',
+      title: 'Listen & Follow',
+      description: 'AI Guidance.',
+      imagePath: 'assets/images/onb_image3.png',
     ),
     const OnboardingPageInfo(
-      title: 'Breathe Better',
-      description: 'Guided breathing for focus and stress relief.',
-      iconName: 'air',
+      title: 'Track Your',
+      description: 'Mindfulness & Progress',
+      imagePath: 'assets/images/onb_image4.png',
     ),
   ];
 

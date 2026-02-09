@@ -10,7 +10,6 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:dio/dio.dart' as _i361;
-import 'package:flutter_tts/flutter_tts.dart' as _i50;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
@@ -102,7 +101,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i758.ElevenLabsRemoteDatasource>(
       () => registerModule.elevenLabsRemoteDatasource,
     );
-    gh.lazySingleton<_i50.FlutterTts>(() => registerModule.flutterTts);
     gh.lazySingleton<_i692.BreathingController>(
       () => _i692.BreathingController(),
     );
@@ -114,21 +112,19 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.elevenLabsDio,
       instanceName: 'elevenLabsDio',
     );
-    gh.lazySingleton<_i369.TtsService>(
-      () => _i369.TtsService(gh<_i50.FlutterTts>()),
-    );
     gh.lazySingleton<_i632.AppPreferences>(
       () => _i632.AppPreferences(gh<_i460.SharedPreferences>()),
     );
     gh.lazySingleton<_i239.GenerationLocalDatasource>(
       () => _i239.GenerationLocalDatasource(gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i369.TtsService>(
+      () => _i369.TtsService(gh<_i758.ElevenLabsRemoteDatasource>()),
+    );
     gh.lazySingleton<_i327.GenerationRepository>(
       () => _i865.GenerationRepositoryImpl(
         gh<_i239.GenerationLocalDatasource>(),
         gh<_i752.OpenRouterRemoteDatasource>(),
-        gh<_i758.ElevenLabsRemoteDatasource>(),
-        gh<_i369.TtsService>(),
       ),
     );
     gh.factory<_i899.GenerateMeditation>(

@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$OnboardingPageInfo {
 
- String get title; String get description; String get iconName;
+ String get title; String get description; String get imagePath;
 /// Create a copy of OnboardingPageInfo
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +25,16 @@ $OnboardingPageInfoCopyWith<OnboardingPageInfo> get copyWith => _$OnboardingPage
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnboardingPageInfo&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.iconName, iconName) || other.iconName == iconName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is OnboardingPageInfo&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.imagePath, imagePath) || other.imagePath == imagePath));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,title,description,iconName);
+int get hashCode => Object.hash(runtimeType,title,description,imagePath);
 
 @override
 String toString() {
-  return 'OnboardingPageInfo(title: $title, description: $description, iconName: $iconName)';
+  return 'OnboardingPageInfo(title: $title, description: $description, imagePath: $imagePath)';
 }
 
 
@@ -45,7 +45,7 @@ abstract mixin class $OnboardingPageInfoCopyWith<$Res>  {
   factory $OnboardingPageInfoCopyWith(OnboardingPageInfo value, $Res Function(OnboardingPageInfo) _then) = _$OnboardingPageInfoCopyWithImpl;
 @useResult
 $Res call({
- String title, String description, String iconName
+ String title, String description, String imagePath
 });
 
 
@@ -62,11 +62,11 @@ class _$OnboardingPageInfoCopyWithImpl<$Res>
 
 /// Create a copy of OnboardingPageInfo
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? iconName = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? title = null,Object? description = null,Object? imagePath = null,}) {
   return _then(_self.copyWith(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,iconName: null == iconName ? _self.iconName : iconName // ignore: cast_nullable_to_non_nullable
+as String,imagePath: null == imagePath ? _self.imagePath : imagePath // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }
@@ -152,10 +152,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String description,  String iconName)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String title,  String description,  String imagePath)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _OnboardingPageInfo() when $default != null:
-return $default(_that.title,_that.description,_that.iconName);case _:
+return $default(_that.title,_that.description,_that.imagePath);case _:
   return orElse();
 
 }
@@ -173,10 +173,10 @@ return $default(_that.title,_that.description,_that.iconName);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String description,  String iconName)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String title,  String description,  String imagePath)  $default,) {final _that = this;
 switch (_that) {
 case _OnboardingPageInfo():
-return $default(_that.title,_that.description,_that.iconName);case _:
+return $default(_that.title,_that.description,_that.imagePath);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -193,10 +193,10 @@ return $default(_that.title,_that.description,_that.iconName);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String description,  String iconName)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String title,  String description,  String imagePath)?  $default,) {final _that = this;
 switch (_that) {
 case _OnboardingPageInfo() when $default != null:
-return $default(_that.title,_that.description,_that.iconName);case _:
+return $default(_that.title,_that.description,_that.imagePath);case _:
   return null;
 
 }
@@ -208,12 +208,12 @@ return $default(_that.title,_that.description,_that.iconName);case _:
 
 
 class _OnboardingPageInfo implements OnboardingPageInfo {
-  const _OnboardingPageInfo({required this.title, required this.description, required this.iconName});
+  const _OnboardingPageInfo({required this.title, required this.description, required this.imagePath});
   
 
 @override final  String title;
 @override final  String description;
-@override final  String iconName;
+@override final  String imagePath;
 
 /// Create a copy of OnboardingPageInfo
 /// with the given fields replaced by the non-null parameter values.
@@ -225,16 +225,16 @@ _$OnboardingPageInfoCopyWith<_OnboardingPageInfo> get copyWith => __$OnboardingP
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnboardingPageInfo&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.iconName, iconName) || other.iconName == iconName));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _OnboardingPageInfo&&(identical(other.title, title) || other.title == title)&&(identical(other.description, description) || other.description == description)&&(identical(other.imagePath, imagePath) || other.imagePath == imagePath));
 }
 
 
 @override
-int get hashCode => Object.hash(runtimeType,title,description,iconName);
+int get hashCode => Object.hash(runtimeType,title,description,imagePath);
 
 @override
 String toString() {
-  return 'OnboardingPageInfo(title: $title, description: $description, iconName: $iconName)';
+  return 'OnboardingPageInfo(title: $title, description: $description, imagePath: $imagePath)';
 }
 
 
@@ -245,7 +245,7 @@ abstract mixin class _$OnboardingPageInfoCopyWith<$Res> implements $OnboardingPa
   factory _$OnboardingPageInfoCopyWith(_OnboardingPageInfo value, $Res Function(_OnboardingPageInfo) _then) = __$OnboardingPageInfoCopyWithImpl;
 @override @useResult
 $Res call({
- String title, String description, String iconName
+ String title, String description, String imagePath
 });
 
 
@@ -262,11 +262,11 @@ class __$OnboardingPageInfoCopyWithImpl<$Res>
 
 /// Create a copy of OnboardingPageInfo
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? iconName = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? title = null,Object? description = null,Object? imagePath = null,}) {
   return _then(_OnboardingPageInfo(
 title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
 as String,description: null == description ? _self.description : description // ignore: cast_nullable_to_non_nullable
-as String,iconName: null == iconName ? _self.iconName : iconName // ignore: cast_nullable_to_non_nullable
+as String,imagePath: null == imagePath ? _self.imagePath : imagePath // ignore: cast_nullable_to_non_nullable
 as String,
   ));
 }

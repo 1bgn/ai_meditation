@@ -7,6 +7,6 @@ abstract class OnboardingPageInfo with _$OnboardingPageInfo {
   const factory OnboardingPageInfo({
     required String title,
     required String description,
-    required String iconName,
+    required String imagePath,
   }) = _OnboardingPageInfo;
 }
