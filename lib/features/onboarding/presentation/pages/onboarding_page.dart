@@ -63,51 +63,55 @@ class _OnboardingPageState extends State<OnboardingPage> {
               padding: const EdgeInsets.all(24),
               child: Column(
                 children: [
-                  SignalBuilder(
-                    signal: _controller.pageIndex,
-                    builder: (context, value, child) => Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(
-                        _controller.pages.length,
-                        (index) => AnimatedContainer(
-                          duration: const Duration(milliseconds: 200),
-                          width: value == index ? 20 : 8,
-                          height: 8,
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          decoration: BoxDecoration(
-                            color: value == index
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context)
-                                    .colorScheme
-                                    .primary
-                                    .withOpacity(0.2),
-                            borderRadius: BorderRadius.circular(4),
+                  Watch(
+                    (context) {
+                      final value = _controller.pageIndex.value;
+                      return Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          _controller.pages.length,
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            width: value == index ? 20 : 8,
+                            height: 8,
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            decoration: BoxDecoration(
+                              color: value == index
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context)
+                                      .colorScheme
+                                      .primary
+                                      .withValues(alpha: 0.2),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 16),
-                  SignalBuilder(
-                    signal: _controller.pageIndex,
-                    builder: (context, value, child) => FilledButton(
-                      onPressed: value == _controller.pages.length - 1
-                          ? _finish
-                          : () => _pageController.nextPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeOut,
-                              ),
-                      child: Text(
-                        value == _controller.pages.length - 1
-                            ? 'Get Started'
-                            : 'Next',
-                      ),
-                    ),
+                  Watch(
+                    (context) {
+                      final value = _controller.pageIndex.value;
+                      return FilledButton(
+                        onPressed: value == _controller.pages.length - 1
+                            ? _finish
+                            : () => _pageController.nextPage(
+                                  duration:
+                                      const Duration(milliseconds: 300),
+                                  curve: Curves.easeOut,
+                                ),
+                        child: Text(
+                          value == _controller.pages.length - 1
+                              ? 'Get Started'
+                              : 'Next',
+                        ),
+                      );
+                    },
                   ),
                   const SizedBox(height: 8),
-                  SignalBuilder(
-                    signal: _controller.isLoading,
-                    builder: (context, value, child) => value
+                  Watch(
+                    (context) => _controller.isLoading.value
                         ? const LinearProgressIndicator()
                         : const SizedBox.shrink(),
                   ),

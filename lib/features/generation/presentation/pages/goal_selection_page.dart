@@ -19,9 +19,8 @@ class GoalSelectionPage extends StatelessWidget {
     final controller = getIt<GenerationController>();
     return Scaffold(
       appBar: AppBar(title: const Text('Select Goal')),
-      body: SignalBuilder(
-        signal: controller.options,
-        builder: (context, value, child) => ListView.separated(
+      body: Watch(
+        (context) => ListView.separated(
           padding: const EdgeInsets.all(24),
           itemCount: _goals.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
@@ -29,7 +28,7 @@ class GoalSelectionPage extends StatelessWidget {
             final goal = _goals[index];
             return ListTile(
               title: Text(goal),
-              trailing: value.goal == goal
+              trailing: controller.options.value.goal == goal
                   ? const Icon(Icons.check)
                   : null,
               onTap: () async {

@@ -46,20 +46,23 @@ class _HomePageState extends State<HomePage> {
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 12),
-            SignalBuilder(
-              signal: _controller.lastMeditationTitle,
-              builder: (context, value, child) => Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  value == null
-                      ? 'No meditation yet. Try generating one.'
-                      : 'Last meditation: $value',
-                ),
-              ),
+            Watch(
+              (context) {
+                final value = _controller.lastMeditationTitle.value;
+                return Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color:
+                        Theme.of(context).colorScheme.surfaceContainerHighest,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    value == null
+                        ? 'No meditation yet. Try generating one.'
+                        : 'Last meditation: $value',
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 24),
             Text(
@@ -89,15 +92,17 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 12),
             SizedBox(
               height: 160,
-              child: SignalBuilder(
-                signal: _controller.recommendations,
-                builder: (context, value, child) => ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: value.length,
-                  itemBuilder: (context, index) => RecommendationCard(
-                    recommendation: value[index],
-                  ),
-                ),
+              child: Watch(
+                (context) {
+                  final value = _controller.recommendations.value;
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: value.length,
+                    itemBuilder: (context, index) => RecommendationCard(
+                      recommendation: value[index],
+                    ),
+                  );
+                },
               ),
             ),
           ],

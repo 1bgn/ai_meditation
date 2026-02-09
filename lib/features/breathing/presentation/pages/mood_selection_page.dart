@@ -19,9 +19,8 @@ class MoodSelectionPage extends StatelessWidget {
     final controller = getIt<BreathingController>();
     return Scaffold(
       appBar: AppBar(title: const Text('Select Mood')),
-      body: SignalBuilder(
-        signal: controller.options,
-        builder: (context, value, child) => ListView.separated(
+      body: Watch(
+        (context) => ListView.separated(
           padding: const EdgeInsets.all(24),
           itemCount: _moods.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
@@ -29,7 +28,9 @@ class MoodSelectionPage extends StatelessWidget {
             final mood = _moods[index];
             return ListTile(
               title: Text(mood),
-              trailing: value.mood == mood ? const Icon(Icons.check) : null,
+              trailing: controller.options.value.mood == mood
+                  ? const Icon(Icons.check)
+                  : null,
               onTap: () {
                 controller.updateMood(mood);
                 Navigator.of(context).pop();

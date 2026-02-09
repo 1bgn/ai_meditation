@@ -35,15 +35,14 @@ class _PaywallPageState extends State<PaywallPage> {
               ),
               const SizedBox(height: 24),
               Expanded(
-                child: SignalBuilder(
-                  signal: _controller.selectedIndex,
-                  builder: (context, value, child) => ListView.separated(
+                child: Watch(
+                  (context) => ListView.separated(
                     itemCount: _controller.offers.length,
                     separatorBuilder: (context, index) =>
                         const SizedBox(height: 12),
                     itemBuilder: (context, index) => _OfferCard(
                       offer: _controller.offers[index],
-                      isSelected: value == index,
+                      isSelected: _controller.selectedIndex.value == index,
                       onTap: () => _controller.select(index),
                     ),
                   ),

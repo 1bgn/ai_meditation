@@ -19,9 +19,8 @@ class BackgroundSoundSelectionPage extends StatelessWidget {
     final controller = getIt<GenerationController>();
     return Scaffold(
       appBar: AppBar(title: const Text('Select Background Sound')),
-      body: SignalBuilder(
-        signal: controller.options,
-        builder: (context, value, child) => ListView.separated(
+      body: Watch(
+        (context) => ListView.separated(
           padding: const EdgeInsets.all(24),
           itemCount: _sounds.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
@@ -29,7 +28,7 @@ class BackgroundSoundSelectionPage extends StatelessWidget {
             final sound = _sounds[index];
             return ListTile(
               title: Text(sound),
-              trailing: value.backgroundSound == sound
+              trailing: controller.options.value.backgroundSound == sound
                   ? const Icon(Icons.check)
                   : null,
               onTap: () async {

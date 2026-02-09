@@ -29,10 +29,9 @@ class _BreathingPageState extends State<BreathingPage> {
         body: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            SignalBuilder(
-              signal: _controller.options,
-              builder: (context, value, child) => _BreathingOptionsSection(
-                options: value,
+            Watch(
+              (context) => _BreathingOptionsSection(
+                options: _controller.options.value,
               ),
             ),
             const SizedBox(height: 24),

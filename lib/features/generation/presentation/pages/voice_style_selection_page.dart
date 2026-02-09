@@ -19,9 +19,8 @@ class VoiceStyleSelectionPage extends StatelessWidget {
     final controller = getIt<GenerationController>();
     return Scaffold(
       appBar: AppBar(title: const Text('Select Voice Style')),
-      body: SignalBuilder(
-        signal: controller.options,
-        builder: (context, value, child) => ListView.separated(
+      body: Watch(
+        (context) => ListView.separated(
           padding: const EdgeInsets.all(24),
           itemCount: _styles.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
@@ -29,7 +28,7 @@ class VoiceStyleSelectionPage extends StatelessWidget {
             final style = _styles[index];
             return ListTile(
               title: Text(style),
-              trailing: value.voiceStyle == style
+              trailing: controller.options.value.voiceStyle == style
                   ? const Icon(Icons.check)
                   : null,
               onTap: () async {

@@ -4,8 +4,9 @@ part 'meditation_history_item.freezed.dart';
 part 'meditation_history_item.g.dart';
 
 @freezed
-@JsonSerializable(fieldRename: FieldRename.snake)
-class MeditationHistoryItem with _$MeditationHistoryItem {
+abstract class MeditationHistoryItem with _$MeditationHistoryItem {
+  // ignore: invalid_annotation_target
+  @JsonSerializable(fieldRename: FieldRename.snake)
   const factory MeditationHistoryItem({
     required String id,
     required String title,

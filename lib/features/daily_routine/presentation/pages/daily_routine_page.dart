@@ -29,11 +29,12 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SignalBuilder(
-                signal: _controller.currentRoutine,
-                builder: (context, value, child) => value == null
+              Watch(
+                (context) => _controller.currentRoutine.value == null
                     ? const Text('Generate a routine to get started.')
-                    : _RoutineCard(item: value),
+                    : _RoutineCard(
+                        item: _controller.currentRoutine.value!,
+                      ),
               ),
               const Spacer(),
               FilledButton(

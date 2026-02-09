@@ -14,9 +14,8 @@ class GenerationDurationSelectionPage extends StatelessWidget {
     final controller = getIt<GenerationController>();
     return Scaffold(
       appBar: AppBar(title: const Text('Select Duration')),
-      body: SignalBuilder(
-        signal: controller.options,
-        builder: (context, value, child) => ListView.separated(
+      body: Watch(
+        (context) => ListView.separated(
           padding: const EdgeInsets.all(24),
           itemCount: _durations.length,
           separatorBuilder: (context, index) => const SizedBox(height: 12),
@@ -24,7 +23,7 @@ class GenerationDurationSelectionPage extends StatelessWidget {
             final duration = _durations[index];
             return ListTile(
               title: Text('$duration min'),
-              trailing: value.durationMinutes == duration
+              trailing: controller.options.value.durationMinutes == duration
                   ? const Icon(Icons.check)
                   : null,
               onTap: () async {

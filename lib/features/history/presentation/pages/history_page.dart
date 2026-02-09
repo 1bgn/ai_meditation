@@ -27,18 +27,18 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.all(24),
-          child: SignalBuilder(
-            signal: _controller.items,
-            builder: (context, value, child) {
-              if (value.isEmpty) {
+          child: Watch(
+            (context) {
+              final items = _controller.items.value;
+              if (items.isEmpty) {
                 return const Center(child: Text('No history yet.'));
               }
               return ListView.separated(
-                itemCount: value.length,
+                itemCount: items.length,
                 separatorBuilder: (context, index) =>
                     const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final item = value[index];
+                  final item = items[index];
                   return Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(

@@ -47,19 +47,17 @@ class _SplashPageState extends State<SplashPage> {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 24),
-                SignalBuilder(
-                  signal: _controller.isLoading,
-                  builder: (context, value, child) => value
+                Watch(
+                  (context) => _controller.isLoading.value
                       ? const CircularProgressIndicator()
                       : const SizedBox.shrink(),
                 ),
                 const SizedBox(height: 16),
-                SignalBuilder(
-                  signal: _controller.error,
-                  builder: (context, value, child) => value == null
+                Watch(
+                  (context) => _controller.error.value == null
                       ? const SizedBox.shrink()
                       : FeatureErrorWidget(
-                          error: value,
+                          error: _controller.error.value!,
                         ),
                 ),
               ],

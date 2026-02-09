@@ -31,26 +31,30 @@ class _GenerationPageState extends State<GenerationPage> {
         body: ListView(
           padding: const EdgeInsets.all(24),
           children: [
-            SignalBuilder(
-              signal: _controller.options,
-              builder: (context, value, child) => _OptionsSection(
-                options: value,
+            Watch(
+              (context) => _OptionsSection(
+                options: _controller.options.value,
               ),
             ),
             const SizedBox(height: 16),
-            SignalBuilder(
-              signal: _controller.error,
-              builder: (context, value, child) =>
-                  value == null ? const SizedBox() : FeatureErrorWidget(
-                        error: value,
-                      ),
+            Watch(
+              (context) => _controller.error.value == null
+                  ? const SizedBox.shrink()
+                  : FeatureErrorWidget(
+                      error: _controller.error.value!,
+                    ),
             ),
             const SizedBox(height: 16),
-            SignalBuilder(
-              signal: _controller.isGenerating,
-              builder: (context, value, child) => FilledButton(
-                onPressed: value ? null : _controller.generate,
-                child: Text(value ? 'Generating...' : 'Generate'),
+            Watch(
+              (context) => FilledButton(
+                onPressed: _controller.isGenerating.value
+                    ? null
+                    : _controller.generate,
+                child: Text(
+                  _controller.isGenerating.value
+                      ? 'Generating...'
+                      : 'Generate',
+                ),
               ),
             ),
           ],
