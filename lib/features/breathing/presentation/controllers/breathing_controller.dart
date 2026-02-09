@@ -3,7 +3,7 @@ import 'package:signals/signals.dart';
 
 import '../../domain/entities/breathing_options.dart';
 
-@injectable
+@lazySingleton
 class BreathingController {
   final options = signal(
     const BreathingOptions(

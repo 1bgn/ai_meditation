@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/breathing/presentation/pages/breathing_page.dart';
 import '../../features/breathing/presentation/pages/'
     'duration_selection_page.dart';
+import '../../features/breathing/presentation/pages/breathing_session_page.dart';
 import '../../features/breathing/presentation/pages/mood_selection_page.dart';
 import '../../features/daily_routine/presentation/pages/'
     'daily_routine_page.dart';
@@ -13,6 +14,7 @@ import '../../features/generation/presentation/pages/'
     'duration_selection_page.dart';
 import '../../features/generation/presentation/pages/generation_page.dart';
 import '../../features/generation/presentation/pages/goal_selection_page.dart';
+import '../../features/generation/presentation/pages/meditation_player_page.dart';
 import '../../features/generation/presentation/pages/'
     'voice_style_selection_page.dart';
 import '../../features/history/presentation/pages/history_page.dart';
@@ -30,9 +32,11 @@ class AppRoutes {
   static const generationDuration = '/generation/duration';
   static const generationVoice = '/generation/voice';
   static const generationBackground = '/generation/background';
+  static const player = '/player';
   static const breathing = '/breathing';
   static const breathingMood = '/breathing/mood';
   static const breathingDuration = '/breathing/duration';
+  static const breathingSession = '/breathing/session';
   static const dailyRoutine = '/daily';
   static const history = '/history';
   static const paywall = '/paywall';
@@ -75,6 +79,18 @@ class AppRouter {
         builder: (context, state) => const BackgroundSoundSelectionPage(),
       ),
       GoRoute(
+        path: AppRoutes.player,
+        builder: (context, state) {
+          final args = state.extra;
+          if (args is! MeditationPlayerArgs) {
+            return const _RouteErrorPage(
+              message: 'Missing player arguments.',
+            );
+          }
+          return MeditationPlayerPage(args: args);
+        },
+      ),
+      GoRoute(
         path: AppRoutes.breathing,
         builder: (context, state) => const BreathingPage(),
       ),
@@ -85,6 +101,10 @@ class AppRouter {
       GoRoute(
         path: AppRoutes.breathingDuration,
         builder: (context, state) => const BreathingDurationSelectionPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.breathingSession,
+        builder: (context, state) => const BreathingSessionPage(),
       ),
       GoRoute(
         path: AppRoutes.dailyRoutine,
@@ -113,4 +133,25 @@ class AppRouter {
       ),
     ),
   );
+}
+
+class _RouteErrorPage extends StatelessWidget {
+  const _RouteErrorPage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: Center(
+          child: SelectableText.rich(
+            TextSpan(
+              text: message,
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyMedium
+                  ?.copyWith(color: Colors.red),
+            ),
+          ),
+        ),
+      );
 }

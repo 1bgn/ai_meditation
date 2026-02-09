@@ -10,12 +10,15 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:dio/dio.dart' as _i361;
+import 'package:flutter_tts/flutter_tts.dart' as _i50;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
 import '../../features/breathing/presentation/controllers/breathing_controller.dart'
     as _i692;
+import '../../features/breathing/presentation/controllers/breathing_session_controller.dart'
+    as _i947;
 import '../../features/daily_routine/presentation/controllers/daily_routine_controller.dart'
     as _i951;
 import '../../features/generation/data/datasources/eleven_labs_remote_datasource.dart'
@@ -36,6 +39,8 @@ import '../../features/generation/domain/usecases/save_generation_options.dart'
     as _i934;
 import '../../features/generation/presentation/controllers/generation_controller.dart'
     as _i145;
+import '../../features/generation/presentation/controllers/meditation_player_controller.dart'
+    as _i1060;
 import '../../features/history/data/datasources/history_local_datasource.dart'
     as _i665;
 import '../../features/history/data/repositories/history_repository_impl.dart'
@@ -72,6 +77,7 @@ import '../../features/paywall/presentation/controllers/paywall_controller.dart'
 import '../../features/splash/presentation/controllers/splash_controller.dart'
     as _i758;
 import '../storage/app_preferences.dart' as _i632;
+import '../tts/tts_service.dart' as _i369;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -86,13 +92,19 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.prefs,
       preResolve: true,
     );
-    gh.factory<_i692.BreathingController>(() => _i692.BreathingController());
+    gh.factory<_i947.BreathingSessionController>(
+      () => _i947.BreathingSessionController(),
+    );
     gh.factory<_i173.PaywallController>(() => _i173.PaywallController());
     gh.lazySingleton<_i752.OpenRouterRemoteDatasource>(
       () => registerModule.openRouterRemoteDatasource,
     );
     gh.lazySingleton<_i758.ElevenLabsRemoteDatasource>(
       () => registerModule.elevenLabsRemoteDatasource,
+    );
+    gh.lazySingleton<_i50.FlutterTts>(() => registerModule.flutterTts);
+    gh.lazySingleton<_i692.BreathingController>(
+      () => _i692.BreathingController(),
     );
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.openRouterDio,
@@ -101,6 +113,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.elevenLabsDio,
       instanceName: 'elevenLabsDio',
+    );
+    gh.lazySingleton<_i369.TtsService>(
+      () => _i369.TtsService(gh<_i50.FlutterTts>()),
     );
     gh.lazySingleton<_i632.AppPreferences>(
       () => _i632.AppPreferences(gh<_i460.SharedPreferences>()),
@@ -113,7 +128,20 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i239.GenerationLocalDatasource>(),
         gh<_i752.OpenRouterRemoteDatasource>(),
         gh<_i758.ElevenLabsRemoteDatasource>(),
+        gh<_i369.TtsService>(),
       ),
+    );
+    gh.factory<_i899.GenerateMeditation>(
+      () => _i899.GenerateMeditation(gh<_i327.GenerationRepository>()),
+    );
+    gh.factory<_i15.GetGenerationOptions>(
+      () => _i15.GetGenerationOptions(gh<_i327.GenerationRepository>()),
+    );
+    gh.factory<_i934.SaveGenerationOptions>(
+      () => _i934.SaveGenerationOptions(gh<_i327.GenerationRepository>()),
+    );
+    gh.factory<_i1060.MeditationPlayerController>(
+      () => _i1060.MeditationPlayerController(gh<_i369.TtsService>()),
     );
     gh.lazySingleton<_i665.HistoryLocalDatasource>(
       () => _i665.HistoryLocalDatasource(gh<_i632.AppPreferences>()),
@@ -133,15 +161,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i561.CompleteOnboarding>(
       () => _i561.CompleteOnboarding(gh<_i430.OnboardingRepository>()),
-    );
-    gh.factory<_i899.GenerateMeditation>(
-      () => _i899.GenerateMeditation(gh<_i327.GenerationRepository>()),
-    );
-    gh.factory<_i15.GetGenerationOptions>(
-      () => _i15.GetGenerationOptions(gh<_i327.GenerationRepository>()),
-    );
-    gh.factory<_i934.SaveGenerationOptions>(
-      () => _i934.SaveGenerationOptions(gh<_i327.GenerationRepository>()),
     );
     gh.factory<_i758.SplashController>(
       () => _i758.SplashController(gh<_i525.CheckOnboardingCompleted>()),

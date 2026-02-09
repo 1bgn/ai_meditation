@@ -1,5 +1,6 @@
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import 'package:dio/dio.dart';
 
@@ -43,4 +44,7 @@ abstract class RegisterModule {
   @lazySingleton
   ElevenLabsRemoteDatasource get elevenLabsRemoteDatasource =>
       ElevenLabsRemoteDatasource(elevenLabsDio);
+
+  @lazySingleton
+  FlutterTts get flutterTts => FlutterTts();
 }

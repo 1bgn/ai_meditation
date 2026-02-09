@@ -8,8 +8,8 @@ class DioClient {
       Dio(
         BaseOptions(
           baseUrl: baseUrl,
-          connectTimeout: const Duration(seconds: 10),
-          receiveTimeout: const Duration(seconds: 15),
+          connectTimeout: const Duration(hours: 10),
+          receiveTimeout: const Duration(hours: 15),
           headers: headers,
         ),
       );

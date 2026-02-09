@@ -29,11 +29,11 @@ class _HomePageState extends State<HomePage> {
           title: const Text('Home'),
           actions: [
             IconButton(
-              onPressed: () => context.go(AppRoutes.history),
+              onPressed: () => context.push(AppRoutes.history),
               icon: const Icon(Icons.history),
             ),
             IconButton(
-              onPressed: () => context.go(AppRoutes.paywall),
+              onPressed: () => context.push(AppRoutes.paywall),
               icon: const Icon(Icons.workspace_premium),
             ),
           ],
@@ -72,17 +72,17 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 12),
             _ActionButton(
               title: 'Generate Meditation',
-              onPressed: () => context.go(AppRoutes.generation),
+              onPressed: () => context.push(AppRoutes.generation),
             ),
             const SizedBox(height: 12),
             _ActionButton(
               title: 'Breathing Exercise',
-              onPressed: () => context.go(AppRoutes.breathing),
+              onPressed: () => context.push(AppRoutes.breathing),
             ),
             const SizedBox(height: 12),
             _ActionButton(
               title: 'Daily Routine',
-              onPressed: () => context.go(AppRoutes.dailyRoutine),
+              onPressed: () => context.push(AppRoutes.dailyRoutine),
             ),
             const SizedBox(height: 24),
             Text(

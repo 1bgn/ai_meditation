@@ -32,6 +32,7 @@ class GenerationController {
   );
   final isGenerating = signal(false);
   final error = signal<String?>(null);
+  final lastScript = signal<String?>(null);
 
   void load() {
     options.value = _getOptions() ?? options.value;
@@ -49,12 +50,13 @@ class GenerationController {
   Future<void> updateBackgroundSound(String sound) =>
       _update(options.value.copyWith(backgroundSound: sound));
 
-  Future<void> generate() async {
+  Future<String?> generate() async {
     isGenerating.value = true;
     error.value = null;
     try {
       await _saveOptions(options.value);
-      await _generateMeditation(options.value);
+      final script = await _generateMeditation(options.value);
+      lastScript.value = script;
       final historyItem = MeditationHistoryItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: '${options.value.goal} Meditation',
@@ -63,8 +65,10 @@ class GenerationController {
         updatedAt: DateTime.now(),
       );
       await _addHistoryItem(historyItem);
+      return script;
     } catch (e) {
       error.value = e.toString();
+      return null;
     } finally {
       isGenerating.value = false;
     }

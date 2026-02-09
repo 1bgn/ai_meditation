@@ -7,6 +7,7 @@ import '../../../../core/router/app_router.dart';
 import '../../../../shared/widgets/feature_error_widget.dart';
 import '../../domain/entities/generation_options.dart';
 import '../controllers/generation_controller.dart';
+import 'meditation_player_page.dart';
 import '../widgets/option_tile.dart';
 
 class GenerationPage extends StatefulWidget {
@@ -49,7 +50,25 @@ class _GenerationPageState extends State<GenerationPage> {
               (context) => FilledButton(
                 onPressed: _controller.isGenerating.value
                     ? null
-                    : _controller.generate,
+                    : () async {
+                        final script = await _controller.generate();
+                        if (!context.mounted || script == null) {
+                          return;
+                        }
+                        context.push(
+                          AppRoutes.player,
+                          extra: MeditationPlayerArgs(
+                            title:
+                                '${_controller.options.value.goal} Meditation',
+                            script: script,
+                            durationMinutes:
+                                _controller.options.value.durationMinutes,
+                            voiceStyle: _controller.options.value.voiceStyle,
+                            backgroundSound:
+                                _controller.options.value.backgroundSound,
+                          ),
+                        );
+                      },
                 child: Text(
                   _controller.isGenerating.value
                       ? 'Generating...'
@@ -73,25 +92,25 @@ class _OptionsSection extends StatelessWidget {
           OptionTile(
             title: 'Goal',
             value: options.goal,
-            onTap: () => context.go(AppRoutes.generationGoal),
+            onTap: () => context.push(AppRoutes.generationGoal),
           ),
           const SizedBox(height: 12),
           OptionTile(
             title: 'Duration',
             value: '${options.durationMinutes} min',
-            onTap: () => context.go(AppRoutes.generationDuration),
+            onTap: () => context.push(AppRoutes.generationDuration),
           ),
           const SizedBox(height: 12),
           OptionTile(
             title: 'Voice Style',
             value: options.voiceStyle,
-            onTap: () => context.go(AppRoutes.generationVoice),
+            onTap: () => context.push(AppRoutes.generationVoice),
           ),
           const SizedBox(height: 12),
           OptionTile(
             title: 'Background Sound',
             value: options.backgroundSound,
-            onTap: () => context.go(AppRoutes.generationBackground),
+            onTap: () => context.push(AppRoutes.generationBackground),
           ),
         ],
       );

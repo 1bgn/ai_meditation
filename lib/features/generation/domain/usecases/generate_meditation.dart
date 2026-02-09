@@ -9,6 +9,6 @@ class GenerateMeditation {
 
   final GenerationRepository _repository;
 
-  Future<void> call(GenerationOptions options) =>
+  Future<String> call(GenerationOptions options) =>
       _repository.generate(options);
 }

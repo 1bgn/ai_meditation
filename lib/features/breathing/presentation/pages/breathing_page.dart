@@ -6,6 +6,7 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
 import '../../domain/entities/breathing_options.dart';
 import '../controllers/breathing_controller.dart';
+import 'breathing_session_page.dart';
 
 class BreathingPage extends StatefulWidget {
   const BreathingPage({super.key});
@@ -36,8 +37,8 @@ class _BreathingPageState extends State<BreathingPage> {
             ),
             const SizedBox(height: 24),
             FilledButton(
-              onPressed: () {},
-              child: const Text('Start Breathing'),
+              onPressed: () => context.push(AppRoutes.breathingSession),
+              child: const Text('Start Session'),
             ),
           ],
         ),
@@ -53,15 +54,15 @@ class _BreathingOptionsSection extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         children: [
           _BreathingOptionTile(
-            title: 'Mood Check-in',
+            title: 'Meditation Goal',
             value: options.mood,
-            onTap: () => context.go(AppRoutes.breathingMood),
+            onTap: () => context.push(AppRoutes.breathingMood),
           ),
           const SizedBox(height: 12),
           _BreathingOptionTile(
             title: 'Duration',
             value: '${options.durationMinutes} min',
-            onTap: () => context.go(AppRoutes.breathingDuration),
+            onTap: () => context.push(AppRoutes.breathingDuration),
           ),
         ],
       );

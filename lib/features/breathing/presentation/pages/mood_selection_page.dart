@@ -9,16 +9,16 @@ class MoodSelectionPage extends StatelessWidget {
 
   static const _moods = [
     'Calm',
-    'Focused',
-    'Energized',
+    'Neutral',
     'Stressed',
+    'Anxious',
   ];
 
   @override
   Widget build(BuildContext context) {
     final controller = getIt<BreathingController>();
     return Scaffold(
-      appBar: AppBar(title: const Text('Select Mood')),
+      appBar: AppBar(title: const Text('Select Goal')),
       body: Watch(
         (context) => ListView.separated(
           padding: const EdgeInsets.all(24),
