@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -121,56 +122,99 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               
-                const SizedBox(height: 16),
-                Watch((context) {
-                  final value = _controller.lastMeditationTitle.value;
-                  return Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      borderRadius: BorderRadius.circular(16),
+                const SizedBox(height:32),
+       
+                Container(
+                  padding: EdgeInsets.only(left: 16,right: 16,top: 16),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(255, 255, 255, 0.48),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: ClipRRect(
+                    child: Container(
+                      decoration:  BoxDecoration(
+                            borderRadius: BorderRadius.circular(40),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromRGBO(255, 255, 255, 0),
+                            Color.fromRGBO(255, 255, 255, 1),
+                          ],
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Stack(children: [Padding(
+                            padding: const EdgeInsets.all(2),
+                            child: Image.asset("assets/images/home_bg.png",opacity: const AlwaysStoppedAnimation(.68,),
+                          ))],),
+                          Positioned.fill(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ActionButton(
+                                        title: 'Generate Meditation'.toUpperCase(),
+                                        position: _ActionButtonPosition.top,
+                                        iconAsset: 'assets/images/generate_mediation.svg',
+                                        onPressed: () => context.push(AppRoutes.generation),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ActionButton(
+                                        title: 'Breathing Exercise'.toUpperCase(),
+                                        position: _ActionButtonPosition.middle,
+                                        iconAsset: 'assets/images/breathing_exercise.svg',
+                                        onPressed: () => context.push(AppRoutes.breathing),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: _ActionButton(
+                                        title: 'Daily Routine'.toUpperCase(),
+                                        position: _ActionButtonPosition.bottom,
+                                        iconAsset: 'assets/images/daily_routine.svg',
+                                        onPressed: () => context.push(AppRoutes.dailyRoutine),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 24),
+                                Text(
+                                  'Recommendations',
+                                  style: Theme.of(context).textTheme.titleMedium,
+                                ),
+                                const SizedBox(height: 12),
+                                SizedBox(
+                                  height: 160,
+                                  child: Watch((context) {
+                                    final value = _controller.recommendations.value;
+                                    return ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: value.length,
+                                      itemBuilder: (context, index) =>
+                                          RecommendationCard(recommendation: value[index]),
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    child: Text(
-                      value == null
-                          ? 'No meditation yet. Try generating one.'
-                          : 'Last meditation: $value',
-                    ),
-                  );
-                }),
-                const SizedBox(height: 24),
-                Text('Quick Actions', style: Theme.of(context).textTheme.titleMedium),
-                const SizedBox(height: 12),
-                _ActionButton(
-                  title: 'Generate Meditation',
-                  onPressed: () => context.push(AppRoutes.generation),
-                ),
-                const SizedBox(height: 12),
-                _ActionButton(
-                  title: 'Breathing Exercise',
-                  onPressed: () => context.push(AppRoutes.breathing),
-                ),
-                const SizedBox(height: 12),
-                _ActionButton(
-                  title: 'Daily Routine',
-                  onPressed: () => context.push(AppRoutes.dailyRoutine),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Recommendations',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 160,
-                  child: Watch((context) {
-                    final value = _controller.recommendations.value;
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      itemCount: value.length,
-                      itemBuilder: (context, index) =>
-                          RecommendationCard(recommendation: value[index]),
-                    );
-                  }),
+                  ),
                 ),
               ],
             ),
@@ -181,15 +225,58 @@ class _HomePageState extends State<HomePage> {
   );
 }
 
+enum _ActionButtonPosition { top, middle, bottom }
+
 class _ActionButton extends StatelessWidget {
-  const _ActionButton({required this.title, required this.onPressed});
+  const _ActionButton({
+    required this.title,
+    required this.position,
+    required this.onPressed,
+    required this.iconAsset,
+  });
 
   final String title;
+  final _ActionButtonPosition position;
   final VoidCallback onPressed;
+  final String iconAsset;
 
   @override
-  Widget build(BuildContext context) => FilledButton(
-    onPressed: onPressed,
-    child: Align(alignment: Alignment.centerLeft, child: Text(title)),
-  );
+  Widget build(BuildContext context) {
+    final borderRadius = switch (position) {
+      _ActionButtonPosition.top => BorderRadius.only(
+        topLeft: const Radius.circular(32),
+        topRight: const Radius.circular(32),
+        bottomLeft: const Radius.circular(12),
+        bottomRight: const Radius.circular(12),
+      ),
+      _ActionButtonPosition.middle => BorderRadius.circular(12),
+      _ActionButtonPosition.bottom => BorderRadius.only(
+        bottomLeft: const Radius.circular(32),
+        bottomRight: const Radius.circular(32),
+        topLeft: const Radius.circular(12),
+        topRight: const Radius.circular(12),
+      ),
+    };
+
+    return FilledButton(
+      onPressed: onPressed,
+      style: FilledButton.styleFrom(
+        shape: RoundedRectangleBorder(borderRadius: borderRadius),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 26),
+      ),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            iconAsset,
+            width: 24,
+            height: 24,
+          ),
+          const SizedBox(width: 36.5),
+          Expanded(child: Text(title)),
+        ],
+      ),
+    );
+  }
 }
