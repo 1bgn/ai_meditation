@@ -1,6 +1,4 @@
 import 'package:ai_meditation/core/ui/slide_to_start.dart';
-import 'package:cupertino_native/components/button.dart';
-import 'package:cupertino_native/style/sf_symbol.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -9,8 +7,11 @@ import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/ui/concave_circle_button.dart';
 import '../../domain/entities/breathing_options.dart';
 import '../controllers/breathing_controller.dart';
+import 'duration_selection_page.dart';
+import 'mood_selection_page.dart';
 
 class BreathingPage extends StatefulWidget {
   const BreathingPage({super.key});
@@ -27,6 +28,25 @@ class _BreathingPageState extends State<BreathingPage> {
     super.initState();
     _controller = getIt<BreathingController>();
   }
+
+  Future<void> _showSelectionSheet(
+    BuildContext context,
+    Widget child,
+  ) => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(32),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.87,
+        child: child,
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -69,13 +89,9 @@ class _BreathingPageState extends State<BreathingPage> {
                     Positioned(
                       top: 18,
                       left: 23,
-                      child: CNButton.icon(
+                      child: ConcaveCircleButton(
                         size: 40,
-                        icon: const CNSymbol(
-                          'xmark',
-                          size: 12,
-                          color: Color(0xffAAAEBA),
-                        ),
+                        svgAssetPath: 'assets/images/close.svg',
                         onPressed: () {
                           Navigator.pop(context);
 
@@ -148,6 +164,14 @@ class _BreathingPageState extends State<BreathingPage> {
                       Watch(
                         (context) => _BreathingOptionsSection(
                           options: _controller.options.value,
+                          onMoodTap: () => _showSelectionSheet(
+                            context,
+                            const MoodSelectionPage(),
+                          ),
+                          onDurationTap: () => _showSelectionSheet(
+                            context,
+                            const BreathingDurationSelectionPage(),
+                          ),
                         ),
                       ),
                       Spacer(),
@@ -186,9 +210,15 @@ class _BreathingPageState extends State<BreathingPage> {
 }
 
 class _BreathingOptionsSection extends StatelessWidget {
-  const _BreathingOptionsSection({required this.options});
+  const _BreathingOptionsSection({
+    required this.options,
+    required this.onMoodTap,
+    required this.onDurationTap,
+  });
 
   final BreathingOptions options;
+  final VoidCallback onMoodTap;
+  final VoidCallback onDurationTap;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -198,8 +228,7 @@ class _BreathingOptionsSection extends StatelessWidget {
         svgDisableIconPath: 'assets/images/disable_goal.svg',
         title: 'Mood Check-in',
         value: options.mood,
-        // value:null,
-        onTap: () => context.push(AppRoutes.breathingMood),
+        onTap: onMoodTap,
       ),
       const SizedBox(height: 12),
       _BreathingOptionTile(
@@ -209,7 +238,7 @@ class _BreathingOptionsSection extends StatelessWidget {
         value: options.durationMinutes != null
             ? '${options.durationMinutes} min'
             : null,
-        onTap: () => context.push(AppRoutes.breathingDuration),
+        onTap: onDurationTap,
       ),
     ],
   );

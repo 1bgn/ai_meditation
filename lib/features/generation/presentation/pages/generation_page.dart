@@ -1,4 +1,5 @@
 import 'package:ai_meditation/core/ui/slide_to_start.dart';
+import 'package:ai_meditation/core/ui/concave_circle_button.dart';
 import 'package:cupertino_native/components/button.dart';
 import 'package:cupertino_native/style/sf_symbol.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,11 @@ import '../../../../core/tts/tts_service.dart';
 import '../../../../shared/widgets/feature_error_widget.dart';
 import '../../domain/entities/generation_options.dart';
 import '../controllers/generation_controller.dart';
+import 'background_sound_selection_page.dart';
+import 'duration_selection_page.dart';
+import 'goal_selection_page.dart';
 import 'meditation_player_page.dart';
+import 'voice_style_selection_page.dart';
 
 class GenerationPage extends StatefulWidget {
   const GenerationPage({super.key});
@@ -67,6 +72,27 @@ class _GenerationPageState extends State<GenerationPage> {
     }
   }
 
+  Future<void> _showSelectionSheet(
+    BuildContext context,
+    Widget child,
+  ) => showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: false,
+    enableDrag: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(32),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.88,
+        child: child,
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Stack(
@@ -111,16 +137,10 @@ class _GenerationPageState extends State<GenerationPage> {
                     Positioned(
                       top: 18,
                       left: 23,
-                      child: CNButton.icon(
-                        size: 40,
-                        icon: const CNSymbol(
-                          'xmark',
-                          size: 12,
-                          color: Color(0xffAAAEBA),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                      ),
-                    ),
+                      child: ConcaveCircleButton(onPressed: (){
+                        Navigator.pop(context);
+                      },svgAssetPath: "assets/images/close.svg",)),
+                    
                     Positioned(
                       child: Align(
                         alignment: Alignment.topCenter,
@@ -185,6 +205,22 @@ class _GenerationPageState extends State<GenerationPage> {
                       Watch(
                         (context) => _OptionsSection(
                           options: _controller.options.value,
+                          onGoalTap: () => _showSelectionSheet(
+                            context,
+                            const GoalSelectionPage(),
+                          ),
+                          onDurationTap: () => _showSelectionSheet(
+                            context,
+                            const GenerationDurationSelectionPage(),
+                          ),
+                          onVoiceTap: () => _showSelectionSheet(
+                            context,
+                            const VoiceStyleSelectionPage(),
+                          ),
+                          onBackgroundTap: () => _showSelectionSheet(
+                            context,
+                            const BackgroundSoundSelectionPage(),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 16),
@@ -237,9 +273,19 @@ class _GenerationPageState extends State<GenerationPage> {
 const _playerLanguage = 'en-US';
 
 class _OptionsSection extends StatelessWidget {
-  const _OptionsSection({required this.options});
+  const _OptionsSection({
+    required this.options,
+    required this.onGoalTap,
+    required this.onDurationTap,
+    required this.onVoiceTap,
+    required this.onBackgroundTap,
+  });
 
   final GenerationOptions options;
+  final VoidCallback onGoalTap;
+  final VoidCallback onDurationTap;
+  final VoidCallback onVoiceTap;
+  final VoidCallback onBackgroundTap;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -249,15 +295,17 @@ class _OptionsSection extends StatelessWidget {
         svgDisableIconPath: 'assets/images/disable_goal.svg',
         title: 'Goal',
         value: options.goal,
-        onTap: () => context.push(AppRoutes.generationGoal),
+        onTap: onGoalTap,
       ),
       const SizedBox(height: 12),
       _GenerationOptionTile(
         svgEnableIconPath: 'assets/images/enable_duration.svg',
         svgDisableIconPath: 'assets/images/disable_duration.svg',
         title: 'Duration',
-        value: options.durationMinutes != null ? '${options.durationMinutes} min' : null,
-        onTap: () => context.push(AppRoutes.generationDuration),
+        value: options.durationMinutes != null
+            ? '${options.durationMinutes} min'
+            : null,
+        onTap: onDurationTap,
       ),
       const SizedBox(height: 12),
       _GenerationOptionTile(
@@ -265,7 +313,7 @@ class _OptionsSection extends StatelessWidget {
         svgDisableIconPath: 'assets/images/disable_style.svg',
         title: 'Voice Style',
         value: options.voiceStyle,
-        onTap: () => context.push(AppRoutes.generationVoice),
+        onTap: onVoiceTap,
       ),
       const SizedBox(height: 12),
       _GenerationOptionTile(
@@ -273,7 +321,7 @@ class _OptionsSection extends StatelessWidget {
         svgDisableIconPath: 'assets/images/disable_sound.svg',
         title: 'Background Sound',
         value: options.backgroundSound,
-        onTap: () => context.push(AppRoutes.generationBackground),
+        onTap: onBackgroundTap,
       ),
     ],
   );
