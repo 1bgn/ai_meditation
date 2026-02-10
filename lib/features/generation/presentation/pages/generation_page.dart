@@ -72,26 +72,40 @@ class _GenerationPageState extends State<GenerationPage> {
     body: Stack(
       children: [
         Positioned.fill(
-          child: Image.asset(
-            'assets/images/meditation_bg.png',
-            fit: BoxFit.cover,
+          child: ClipRRect(
+            child: Transform.translate(
+              offset: Offset(0, -40),
+              child: Image.asset(
+                'assets/images/meditation_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              height: 112,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: AlignmentGeometry.topCenter,
+                  end: AlignmentGeometry.bottomCenter,
+                  colors: [
+                    Color(0xffF3F4F8),
+                    Color(0xffF3F4F8).withAlpha(0),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
         Positioned.fill(
           child: Column(
             children: [
               Container(
-                height: 112,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      const Color(0xffF3F4F8),
-                      const Color(0xffF3F4F8).withAlpha(0),
-                    ],
-                  ),
-                ),
+                decoration: BoxDecoration(),
+                height: 58,
                 child: Stack(
                   children: [
                     Positioned(
@@ -181,6 +195,8 @@ class _GenerationPageState extends State<GenerationPage> {
                                 error: _controller.error.value!,
                               ),
                       ),
+                      const Spacer(),
+                      const SizedBox(height: 24),
                       SafeArea(
                         bottom: true,
                         child: Watch(
