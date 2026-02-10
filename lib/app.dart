@@ -16,8 +16,9 @@ class _AiMeditationAppState extends State<AiMeditationApp> {
 
   @override
   Widget build(BuildContext context) => MaterialApp.router(
-        title: 'AI Meditation',
+  
         theme: AppTheme.light(),
+        
         routerConfig: _router,
       );
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/di/injection_container.dart';
-import '../../../../core/ui/action_slider.dart';
+import '../../../../core/ui/slide_to_start.dart';
 import '../../domain/entities/daily_routine_item.dart';
 import '../controllers/daily_routine_controller.dart';
 
@@ -39,7 +40,6 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -55,33 +55,17 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
       body: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [
-              Color(0xFFF6F7FB),
-              Color(0xFFFFFFFF),
-            ],
+            colors: [Color(0xFFF6F7FB), Color(0xFFFFFFFF)],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
         ),
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 80, 20, 24),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Daily Rhythm',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  'A short mindful ritual for morning, afternoon, and night.',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 24),
                 Expanded(
                   child: ListView.separated(
                     physics: const BouncingScrollPhysics(),
@@ -109,8 +93,9 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                ActionSlider(
-                  onCompleted: () async {
+                SlideToStart(
+                  label: 'START',
+                  onComplete: () async {
                     await _controller.completeRoutine();
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -120,14 +105,15 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                     );
                   },
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {},
-                  child: const Text(
-                    'Mark as done',
-                    style: TextStyle(
-                      letterSpacing: 1.2,
+                  child:  Text(
+                    'Mark as done'.toUpperCase(),
+                    style: GoogleFonts.funnelDisplay(
+                      letterSpacing: -1,
                       fontWeight: FontWeight.w600,
+                      color: Colors.black,
                     ),
                   ),
                 ),
@@ -155,73 +141,87 @@ class _MeditationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 18,
-            color: Colors.black.withOpacity(0.05),
-            offset: const Offset(0, 8),
+    return Column(
+      children: [
+        _DailyRoutineHeader(title: title),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
           ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.asset(
-              imageAsset,
-              width: 88,
-              height: 88,
-              fit: BoxFit.cover,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        title,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w700,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Image.asset(
+                      imageAsset,
+                      width: 88,
+                      height: 88,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          '${item.durationMinutes} MIN'.toUpperCase(),
+                          style: GoogleFonts.funnelDisplay(
+                            fontSize: 14,
+                            height: 20 / 14,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${item.durationMinutes} minutes'.toUpperCase(),
+                          style: GoogleFonts.funnelDisplay(
+                            fontSize: 16,
+                            height: 24 / 16,
+                            letterSpacing: -0.5,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
                     Text(
-                      '${item.durationMinutes} min',
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
+                      item.description,
+                      style: GoogleFonts.funnelDisplay(
+                        fontSize: 14,
+                        height: 20 / 14,
+                        color: Color(0xffAAAEBA),
+                        letterSpacing: -0.5,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  item.description,
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  '${item.durationMinutes} min',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -246,70 +246,116 @@ class _BreathingCard extends StatelessWidget {
       width: 88,
       height: 88,
       decoration: BoxDecoration(
-        color: Color.lerp(color, Colors.white, 0.35) ?? color,
+        color: Color.fromRGBO(119, 201, 126, 0.16),
+
         borderRadius: BorderRadius.circular(18),
       ),
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          SvgPicture.asset(
-            imageAsset,
-            width: 44,
-            height: 44,
-            colorFilter:
-                const ColorFilter.mode(Color(0xFF77C97E), BlendMode.srcIn),
-          ),
-          Positioned(
-            bottom: 6,
-            child: Text(
-              durationLabel,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.5,
-              ),
-            ),
-          )
-        ],
-      ),
+      child: Center(child: SvgPicture.asset(imageAsset, width: 40)),
     );
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        children: [
-          imageBackground,
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  item.title,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  item.description,
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Inhale 4 sec • Exhale 6 sec',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
+    return Column(
+      children: [
+        _DailyRoutineHeader(title: item.title),
+        const SizedBox(height: 12),
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
           ),
-        ],
+          child: Row(
+            children: [
+              imageBackground,
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "RELAX",
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      "Calm your mind and body",
+                      style: GoogleFonts.funnelDisplay(
+                        fontSize: 14,
+                        height: 20 / 14,
+                        color: Color(0xffAAAEBA),
+                        letterSpacing: -0.5,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    RichText(
+                      text: TextSpan(
+                        text: "Inhale ",
+                        style: GoogleFonts.funnelDisplay(fontSize: 14,height: 20/14,color: Color(0xffAAAEBA),letterSpacing: -0.5,fontWeight: FontWeight.w400),
+                        children: [
+                          TextSpan(
+                            text: "4 sec. ",
+                            style: GoogleFonts.funnelDisplay(
+                              fontSize: 14,
+                              height: 20 / 14,
+                              color: Colors.black,
+                              letterSpacing: -0.5,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "Exhale",
+                                style: GoogleFonts.funnelDisplay(
+                                  fontSize: 14,
+                                  height: 20 / 14,
+                                  color: Color(0xffAAAEBA),
+                                  letterSpacing: -0.5,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                              TextSpan(text: " 6 sec.",style: GoogleFonts.funnelDisplay(fontSize: 14,height: 20/14,color: Colors.black,letterSpacing: -0.5,fontWeight: FontWeight.w400),),
+                            ],
+                          
+                         
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DailyRoutineHeader extends StatelessWidget {
+  final String title;
+  const _DailyRoutineHeader({required this.title});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(100),
+      ),
+      child: Center(
+        child: Text(
+          title,
+          style: GoogleFonts.funnelDisplay(
+            fontSize: 16,
+            height: 24 / 16,
+            letterSpacing: -0.5,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
       ),
     );
   }

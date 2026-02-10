@@ -8,5 +8,6 @@ class AppTheme {
         textTheme: GoogleFonts.funnelDisplayTextTheme(),
         fontFamily: GoogleFonts.funnelDisplay().fontFamily,
         fontFamilyFallback: const ['Amstelvar'],
+        scaffoldBackgroundColor: const Color(0xFFF6F7FA),
       );
 }

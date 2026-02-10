@@ -17,7 +17,7 @@ class DailyRoutineController {
       durationMinutes: 2,
     ),
     DailyRoutineItem(
-      title: 'Afternoon Breathing',
+      title: 'Afternoon breathing',
       description: 'Inhale 4 sec • Exhale 6 sec',
       durationMinutes: 5,
     ),
