@@ -54,9 +54,9 @@ class _GenerationPageState extends State<GenerationPage> {
         extra: MeditationPlayerArgs(
           title: '${_controller.options.value.goal} Meditation',
           script: script,
-          durationMinutes: _controller.options.value.durationMinutes,
-          voiceStyle: _controller.options.value.voiceStyle,
-          backgroundSound: _controller.options.value.backgroundSound,
+          durationMinutes: _controller.options.value.durationMinutes!,
+          voiceStyle: _controller.options.value.voiceStyle!,
+          backgroundSound: _controller.options.value.backgroundSound!,
           preloadedSource: source,
         ),
       );
@@ -212,7 +212,7 @@ class _GenerationPageState extends State<GenerationPage> {
                               height: 96,
                               child: Center(
                                 child: SlideToStart(
-                                  enabled: !isBusy,
+                                  enabled: !isBusy&&_controller.options.value.goal!=null&&_controller.options.value.durationMinutes!=null&&_controller.options.value.voiceStyle!=null&&_controller.options.value.backgroundSound!=null,
                                   label: buttonLabel,
                                   onComplete: () =>
                                       _generateAndOpenPlayer(context),
@@ -256,21 +256,21 @@ class _OptionsSection extends StatelessWidget {
         svgEnableIconPath: 'assets/images/enable_duration.svg',
         svgDisableIconPath: 'assets/images/disable_duration.svg',
         title: 'Duration',
-        value: '${options.durationMinutes} min',
+        value: options.durationMinutes != null ? '${options.durationMinutes} min' : null,
         onTap: () => context.push(AppRoutes.generationDuration),
       ),
       const SizedBox(height: 12),
       _GenerationOptionTile(
-        svgEnableIconPath: 'assets/images/enable_goal.svg',
-        svgDisableIconPath: 'assets/images/disable_goal.svg',
+        svgEnableIconPath: 'assets/images/enable_style.svg',
+        svgDisableIconPath: 'assets/images/disable_style.svg',
         title: 'Voice Style',
         value: options.voiceStyle,
         onTap: () => context.push(AppRoutes.generationVoice),
       ),
       const SizedBox(height: 12),
       _GenerationOptionTile(
-        svgEnableIconPath: 'assets/images/enable_goal.svg',
-        svgDisableIconPath: 'assets/images/disable_goal.svg',
+        svgEnableIconPath: 'assets/images/enable_sound.svg',
+        svgDisableIconPath: 'assets/images/disable_sound.svg',
         title: 'Background Sound',
         value: options.backgroundSound,
         onTap: () => context.push(AppRoutes.generationBackground),

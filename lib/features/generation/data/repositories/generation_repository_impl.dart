@@ -55,8 +55,8 @@ class GenerationRepositoryImpl implements GenerationRepository {
   }
 
   String _buildPrompt(GenerationOptions options) {
-    final goalGuidance = _goalGuidance(options.goal);
-    final voiceGuidance = _voiceStyleGuidance(options.voiceStyle);
+    final goalGuidance = _goalGuidance(options.goal!);
+    final voiceGuidance = _voiceStyleGuidance(options.voiceStyle!);
     return 'Write a ${options.durationMinutes}-minute guided meditation '
         'script. Goal: ${options.goal}. '
         'Use these goal cues: $goalGuidance '

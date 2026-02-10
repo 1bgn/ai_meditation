@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$GenerationOptions {
 
- String get goal; int get durationMinutes; String get voiceStyle; String get backgroundSound;
+ String? get goal; int? get durationMinutes; String? get voiceStyle; String? get backgroundSound;
 /// Create a copy of GenerationOptions
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -48,7 +48,7 @@ abstract mixin class $GenerationOptionsCopyWith<$Res>  {
   factory $GenerationOptionsCopyWith(GenerationOptions value, $Res Function(GenerationOptions) _then) = _$GenerationOptionsCopyWithImpl;
 @useResult
 $Res call({
- String goal, int durationMinutes, String voiceStyle, String backgroundSound
+ String? goal, int? durationMinutes, String? voiceStyle, String? backgroundSound
 });
 
 
@@ -65,13 +65,13 @@ class _$GenerationOptionsCopyWithImpl<$Res>
 
 /// Create a copy of GenerationOptions
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? goal = null,Object? durationMinutes = null,Object? voiceStyle = null,Object? backgroundSound = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? goal = freezed,Object? durationMinutes = freezed,Object? voiceStyle = freezed,Object? backgroundSound = freezed,}) {
   return _then(_self.copyWith(
-goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
-as String,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
-as int,voiceStyle: null == voiceStyle ? _self.voiceStyle : voiceStyle // ignore: cast_nullable_to_non_nullable
-as String,backgroundSound: null == backgroundSound ? _self.backgroundSound : backgroundSound // ignore: cast_nullable_to_non_nullable
-as String,
+goal: freezed == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
+as String?,durationMinutes: freezed == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int?,voiceStyle: freezed == voiceStyle ? _self.voiceStyle : voiceStyle // ignore: cast_nullable_to_non_nullable
+as String?,backgroundSound: freezed == backgroundSound ? _self.backgroundSound : backgroundSound // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -156,7 +156,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String goal,  int durationMinutes,  String voiceStyle,  String backgroundSound)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? goal,  int? durationMinutes,  String? voiceStyle,  String? backgroundSound)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _GenerationOptions() when $default != null:
 return $default(_that.goal,_that.durationMinutes,_that.voiceStyle,_that.backgroundSound);case _:
@@ -177,7 +177,7 @@ return $default(_that.goal,_that.durationMinutes,_that.voiceStyle,_that.backgrou
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String goal,  int durationMinutes,  String voiceStyle,  String backgroundSound)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? goal,  int? durationMinutes,  String? voiceStyle,  String? backgroundSound)  $default,) {final _that = this;
 switch (_that) {
 case _GenerationOptions():
 return $default(_that.goal,_that.durationMinutes,_that.voiceStyle,_that.backgroundSound);case _:
@@ -197,7 +197,7 @@ return $default(_that.goal,_that.durationMinutes,_that.voiceStyle,_that.backgrou
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String goal,  int durationMinutes,  String voiceStyle,  String backgroundSound)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? goal,  int? durationMinutes,  String? voiceStyle,  String? backgroundSound)?  $default,) {final _that = this;
 switch (_that) {
 case _GenerationOptions() when $default != null:
 return $default(_that.goal,_that.durationMinutes,_that.voiceStyle,_that.backgroundSound);case _:
@@ -215,10 +215,10 @@ class _GenerationOptions implements GenerationOptions {
   const _GenerationOptions({required this.goal, required this.durationMinutes, required this.voiceStyle, required this.backgroundSound});
   factory _GenerationOptions.fromJson(Map<String, dynamic> json) => _$GenerationOptionsFromJson(json);
 
-@override final  String goal;
-@override final  int durationMinutes;
-@override final  String voiceStyle;
-@override final  String backgroundSound;
+@override final  String? goal;
+@override final  int? durationMinutes;
+@override final  String? voiceStyle;
+@override final  String? backgroundSound;
 
 /// Create a copy of GenerationOptions
 /// with the given fields replaced by the non-null parameter values.
@@ -253,7 +253,7 @@ abstract mixin class _$GenerationOptionsCopyWith<$Res> implements $GenerationOpt
   factory _$GenerationOptionsCopyWith(_GenerationOptions value, $Res Function(_GenerationOptions) _then) = __$GenerationOptionsCopyWithImpl;
 @override @useResult
 $Res call({
- String goal, int durationMinutes, String voiceStyle, String backgroundSound
+ String? goal, int? durationMinutes, String? voiceStyle, String? backgroundSound
 });
 
 
@@ -270,13 +270,13 @@ class __$GenerationOptionsCopyWithImpl<$Res>
 
 /// Create a copy of GenerationOptions
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? goal = null,Object? durationMinutes = null,Object? voiceStyle = null,Object? backgroundSound = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? goal = freezed,Object? durationMinutes = freezed,Object? voiceStyle = freezed,Object? backgroundSound = freezed,}) {
   return _then(_GenerationOptions(
-goal: null == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
-as String,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
-as int,voiceStyle: null == voiceStyle ? _self.voiceStyle : voiceStyle // ignore: cast_nullable_to_non_nullable
-as String,backgroundSound: null == backgroundSound ? _self.backgroundSound : backgroundSound // ignore: cast_nullable_to_non_nullable
-as String,
+goal: freezed == goal ? _self.goal : goal // ignore: cast_nullable_to_non_nullable
+as String?,durationMinutes: freezed == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int?,voiceStyle: freezed == voiceStyle ? _self.voiceStyle : voiceStyle // ignore: cast_nullable_to_non_nullable
+as String?,backgroundSound: freezed == backgroundSound ? _self.backgroundSound : backgroundSound // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -8,10 +8,10 @@ abstract class GenerationOptions with _$GenerationOptions {
   // ignore: invalid_annotation_target
   @JsonSerializable(fieldRename: FieldRename.snake)
   const factory GenerationOptions({
-    required String goal,
-    required int durationMinutes,
-    required String voiceStyle,
-    required String backgroundSound,
+    required String? goal,
+    required int? durationMinutes,
+    required String? voiceStyle,
+    required String? backgroundSound,
   }) = _GenerationOptions;
 
   factory GenerationOptions.fromJson(Map<String, dynamic> json) =>

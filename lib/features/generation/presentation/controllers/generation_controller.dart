@@ -24,10 +24,10 @@ class GenerationController {
 
   final options = signal(
     const GenerationOptions(
-      goal: 'Relax',
-      durationMinutes: 10,
-      voiceStyle: 'Soft',
-      backgroundSound: 'Ocean',
+      goal: null,
+      durationMinutes: null,
+      voiceStyle: null,
+      backgroundSound: null,
     ),
   );
   final isGenerating = signal(false);
@@ -35,7 +35,7 @@ class GenerationController {
   final lastScript = signal<String?>(null);
 
   void load() {
-    options.value = _getOptions() ?? options.value;
+    options.value =  options.value;
   }
 
   Future<void> updateGoal(String goal) =>
@@ -60,7 +60,7 @@ class GenerationController {
       final historyItem = MeditationHistoryItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         title: '${options.value.goal} Meditation',
-        durationMinutes: options.value.durationMinutes,
+        durationMinutes: options.value.durationMinutes!,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );

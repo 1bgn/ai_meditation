@@ -8,10 +8,10 @@ part of 'generation_options.dart';
 
 _GenerationOptions _$GenerationOptionsFromJson(Map<String, dynamic> json) =>
     _GenerationOptions(
-      goal: json['goal'] as String,
-      durationMinutes: (json['duration_minutes'] as num).toInt(),
-      voiceStyle: json['voice_style'] as String,
-      backgroundSound: json['background_sound'] as String,
+      goal: json['goal'] as String?,
+      durationMinutes: (json['duration_minutes'] as num?)?.toInt(),
+      voiceStyle: json['voice_style'] as String?,
+      backgroundSound: json['background_sound'] as String?,
     );
 
 Map<String, dynamic> _$GenerationOptionsToJson(_GenerationOptions instance) =>
