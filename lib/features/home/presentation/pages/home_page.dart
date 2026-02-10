@@ -7,6 +7,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../breathing/presentation/pages/breathing_page.dart';
+import '../../../generation/presentation/pages/generation_page.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/recommendation_card.dart';
 
@@ -160,7 +161,7 @@ class _HomePageState extends State<HomePage> {
                                         title: 'Generate Meditation'.toUpperCase(),
                                         position: _ActionButtonPosition.top,
                                         iconAsset: 'assets/images/generate_mediation.svg',
-                                        onPressed: () => context.push(AppRoutes.generation),
+                                        onPressed: () => _showGenerationSheet(context),
                                       ),
                                     ),
                                   ],
@@ -281,6 +282,24 @@ class _ActionButton extends StatelessWidget {
     );
   }
 
+}
+
+void _showGenerationSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(32),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.9,
+        child: const GenerationPage(),
+      ),
+    ),
+  );
 }
 
 void _showBreathingSheet(BuildContext context) {
