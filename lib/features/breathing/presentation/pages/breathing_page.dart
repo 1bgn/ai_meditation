@@ -33,23 +33,37 @@ class _BreathingPageState extends State<BreathingPage> {
     body: Stack(
       children: [
         Positioned.fill(
-          child: Image.asset(
-            "assets/images/breathing_exercise_bg.png",
-            fit: BoxFit.cover,
+          child: ClipRRect(
+
+            child: Transform.translate(
+              offset: Offset(0, -40),
+              child: Image.asset(
+                "assets/images/breathing_exercise_bg.png",
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
         ),
+        Positioned(child:  Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            height: 112,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: AlignmentGeometry.topCenter,
+                      end: AlignmentGeometry.bottomCenter,
+                      colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
+                    ),
+                  ),),
+        ),),
         Positioned.fill(
           child: Column(
             children: [
               Container(
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: AlignmentGeometry.topCenter,
-                    end: AlignmentGeometry.bottomCenter,
-                    colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
-                  ),
+              
                 ),
-                height: 112,
+                height: 56,
                 child: Stack(
                   children: [
                     Positioned(
