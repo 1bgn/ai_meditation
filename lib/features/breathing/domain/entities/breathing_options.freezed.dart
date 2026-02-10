@@ -14,7 +14,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$BreathingOptions {
 
- String get mood; int get durationMinutes;
+ String? get mood; int? get durationMinutes;
 /// Create a copy of BreathingOptions
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -45,7 +45,7 @@ abstract mixin class $BreathingOptionsCopyWith<$Res>  {
   factory $BreathingOptionsCopyWith(BreathingOptions value, $Res Function(BreathingOptions) _then) = _$BreathingOptionsCopyWithImpl;
 @useResult
 $Res call({
- String mood, int durationMinutes
+ String? mood, int? durationMinutes
 });
 
 
@@ -62,11 +62,11 @@ class _$BreathingOptionsCopyWithImpl<$Res>
 
 /// Create a copy of BreathingOptions
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? mood = null,Object? durationMinutes = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? mood = freezed,Object? durationMinutes = freezed,}) {
   return _then(_self.copyWith(
-mood: null == mood ? _self.mood : mood // ignore: cast_nullable_to_non_nullable
-as String,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
-as int,
+mood: freezed == mood ? _self.mood : mood // ignore: cast_nullable_to_non_nullable
+as String?,durationMinutes: freezed == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 
@@ -151,7 +151,7 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String mood,  int durationMinutes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String? mood,  int? durationMinutes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _BreathingOptions() when $default != null:
 return $default(_that.mood,_that.durationMinutes);case _:
@@ -172,7 +172,7 @@ return $default(_that.mood,_that.durationMinutes);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String mood,  int durationMinutes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String? mood,  int? durationMinutes)  $default,) {final _that = this;
 switch (_that) {
 case _BreathingOptions():
 return $default(_that.mood,_that.durationMinutes);case _:
@@ -192,7 +192,7 @@ return $default(_that.mood,_that.durationMinutes);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String mood,  int durationMinutes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String? mood,  int? durationMinutes)?  $default,) {final _that = this;
 switch (_that) {
 case _BreathingOptions() when $default != null:
 return $default(_that.mood,_that.durationMinutes);case _:
@@ -210,8 +210,8 @@ class _BreathingOptions implements BreathingOptions {
   const _BreathingOptions({required this.mood, required this.durationMinutes});
   
 
-@override final  String mood;
-@override final  int durationMinutes;
+@override final  String? mood;
+@override final  int? durationMinutes;
 
 /// Create a copy of BreathingOptions
 /// with the given fields replaced by the non-null parameter values.
@@ -243,7 +243,7 @@ abstract mixin class _$BreathingOptionsCopyWith<$Res> implements $BreathingOptio
   factory _$BreathingOptionsCopyWith(_BreathingOptions value, $Res Function(_BreathingOptions) _then) = __$BreathingOptionsCopyWithImpl;
 @override @useResult
 $Res call({
- String mood, int durationMinutes
+ String? mood, int? durationMinutes
 });
 
 
@@ -260,11 +260,11 @@ class __$BreathingOptionsCopyWithImpl<$Res>
 
 /// Create a copy of BreathingOptions
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mood = null,Object? durationMinutes = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mood = freezed,Object? durationMinutes = freezed,}) {
   return _then(_BreathingOptions(
-mood: null == mood ? _self.mood : mood // ignore: cast_nullable_to_non_nullable
-as String,durationMinutes: null == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
-as int,
+mood: freezed == mood ? _self.mood : mood // ignore: cast_nullable_to_non_nullable
+as String?,durationMinutes: freezed == durationMinutes ? _self.durationMinutes : durationMinutes // ignore: cast_nullable_to_non_nullable
+as int?,
   ));
 }
 

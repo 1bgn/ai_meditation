@@ -7,8 +7,8 @@ import '../../domain/entities/breathing_options.dart';
 class BreathingController {
   final options = signal(
     const BreathingOptions(
-      mood: 'Calm',
-      durationMinutes: 3,
+      mood: null,
+      durationMinutes: null,
     ),
   );
 

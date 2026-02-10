@@ -50,6 +50,7 @@ dependencies:
   audio_session: ^0.2.2
   google_fonts: ^8.0.1
   flutter_svg: ^2.2.3
+  cupertino_native: ^0.1.1
 
 dev_dependencies:
   flutter_test:
