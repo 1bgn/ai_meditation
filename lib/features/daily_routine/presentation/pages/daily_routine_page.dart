@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/ui/action_slider.dart';
 import '../../domain/entities/daily_routine_item.dart';
 import '../controllers/daily_routine_controller.dart';
 
@@ -22,9 +23,9 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
   ];
 
   static const _sectionImages = [
+    'assets/images/morning_meditation.png',
     'assets/images/daily_routine.svg',
-    'assets/images/breathing_exercise.svg',
-    'assets/images/generate_mediation.svg',
+    'assets/images/evening_meditation.png',
   ];
 
   @override
@@ -81,30 +82,35 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                   style: theme.textTheme.bodyMedium,
                 ),
                 const SizedBox(height: 24),
-                ...List.generate(
-                  _controller.routineItems.length,
-                  (index) => Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Text(
-                        _sectionTitles[index],
-                        style: theme.textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _RoutineCard(
-                        item: _controller.routineItems[index],
-                        imageAsset: _sectionImages[index],
-                      ),
-                      const SizedBox(height: 18),
-                    ],
+                Expanded(
+                  child: ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: _controller.routineItems.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 18),
+                    itemBuilder: (context, index) {
+                      final item = _controller.routineItems[index];
+                      final image = _sectionImages[index];
+                      final title = _sectionTitles[index];
+                      if (index == 1) {
+                        return _BreathingCard(
+                          item: item,
+                          imageAsset: image,
+                          color: const Color.fromRGBO(119, 201, 126, 0.16),
+                          durationLabel: '${item.durationMinutes} min',
+                        );
+                      }
+                      return _MeditationCard(
+                        item: item,
+                        imageAsset: image,
+                        title: title,
+                      );
+                    },
                   ),
                 ),
-                const Spacer(),
-                FilledButton(
-                  onPressed: () async {
+                const SizedBox(height: 16),
+                ActionSlider(
+                  onCompleted: () async {
                     await _controller.completeRoutine();
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -113,29 +119,8 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                       ),
                     );
                   },
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 18),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor: Colors.black,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Text(
-                        'START',
-                        style: TextStyle(
-                          letterSpacing: 1.4,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Icon(Icons.arrow_forward),
-                    ],
-                  ),
                 ),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: () {},
                   child: const Text(
@@ -155,14 +140,16 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
   }
 }
 
-class _RoutineCard extends StatelessWidget {
-  const _RoutineCard({
+class _MeditationCard extends StatelessWidget {
+  const _MeditationCard({
     required this.item,
     required this.imageAsset,
+    required this.title,
   });
 
   final DailyRoutineItem item;
   final String imageAsset;
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -182,13 +169,14 @@ class _RoutineCard extends StatelessWidget {
         ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ClipRRect(
-            borderRadius: BorderRadius.circular(14),
-            child: SvgPicture.asset(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.asset(
               imageAsset,
-              width: 72,
-              height: 72,
+              width: 88,
+              height: 88,
               fit: BoxFit.cover,
             ),
           ),
@@ -197,10 +185,112 @@ class _RoutineCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      '${item.durationMinutes} min',
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
                 Text(
-                  '${item.durationMinutes} min${item.durationMinutes > 1 ? 'UTES' : 'UTE'}',
+                  item.description,
+                  style: theme.textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  '${item.durationMinutes} min',
                   style: theme.textTheme.titleLarge?.copyWith(
-                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BreathingCard extends StatelessWidget {
+  const _BreathingCard({
+    required this.item,
+    required this.imageAsset,
+    required this.color,
+    required this.durationLabel,
+  });
+
+  final DailyRoutineItem item;
+  final String imageAsset;
+  final Color color;
+  final String durationLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final imageBackground = Container(
+      width: 88,
+      height: 88,
+      decoration: BoxDecoration(
+        color: Color.lerp(color, Colors.white, 0.35) ?? color,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          SvgPicture.asset(
+            imageAsset,
+            width: 44,
+            height: 44,
+            colorFilter:
+                const ColorFilter.mode(Color(0xFF77C97E), BlendMode.srcIn),
+          ),
+          Positioned(
+            bottom: 6,
+            child: Text(
+              durationLabel,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        children: [
+          imageBackground,
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item.title,
+                  style: theme.textTheme.titleMedium?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -211,8 +301,8 @@ class _RoutineCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  item.title,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  'Inhale 4 sec • Exhale 6 sec',
+                  style: theme.textTheme.bodySmall?.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),

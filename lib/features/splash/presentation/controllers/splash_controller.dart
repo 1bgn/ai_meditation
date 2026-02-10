@@ -14,7 +14,7 @@ class SplashController {
 
   String resolveNextRoute() {
     try {
-      final completed = _checkOnboardingCompleted();
+      final completed = _checkOnboardingCompleted()&&false;
       return completed ? '/home' : '/onboarding';
     } catch (e) {
       error.value = e.toString();
