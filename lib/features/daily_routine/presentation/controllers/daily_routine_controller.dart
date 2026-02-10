@@ -1,7 +1,4 @@
-import 'dart:math';
-
 import 'package:injectable/injectable.dart';
-import 'package:signals/signals.dart';
 
 import '../../../history/domain/entities/meditation_history_item.dart';
 import '../../../history/domain/usecases/add_history_item.dart';
@@ -13,41 +10,34 @@ class DailyRoutineController {
 
   final AddHistoryItem _addHistoryItem;
 
-  final currentRoutine = signal<DailyRoutineItem?>(null);
-
-  final routines = [
-    const DailyRoutineItem(
-      title: 'Morning Reset',
-      description: 'Breathing + focus meditation',
-      durationMinutes: 8,
+  final routineItems = const [
+    DailyRoutineItem(
+      title: 'Morning Meditation',
+      description: 'Gentle focus + breath awareness',
+      durationMinutes: 2,
     ),
-    const DailyRoutineItem(
-      title: 'Midday Pause',
-      description: 'Quick body scan for clarity',
-      durationMinutes: 6,
+    DailyRoutineItem(
+      title: 'Afternoon Breathing',
+      description: 'Inhale 4 sec • Exhale 6 sec',
+      durationMinutes: 5,
     ),
-    const DailyRoutineItem(
-      title: 'Evening Wind-Down',
-      description: 'Relaxation to end the day',
-      durationMinutes: 10,
-    ),
-    const DailyRoutineItem(
-      title: 'Creative Boost',
-      description: 'Breathing + visualization',
-      durationMinutes: 7,
+    DailyRoutineItem(
+      title: 'Evening Relaxation',
+      description: 'Slow body scan to let go',
+      durationMinutes: 3,
     ),
   ];
 
-  Future<void> generate() async {
-    final next = routines[Random().nextInt(routines.length)];
-    currentRoutine.value = next;
-    final historyItem = MeditationHistoryItem(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: next.title,
-      durationMinutes: next.durationMinutes,
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    await _addHistoryItem(historyItem);
+  Future<void> completeRoutine() async {
+    for (final item in routineItems) {
+      final historyItem = MeditationHistoryItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: item.title,
+        durationMinutes: item.durationMinutes,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      await _addHistoryItem(historyItem);
+    }
   }
 }
