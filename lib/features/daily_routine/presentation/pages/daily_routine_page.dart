@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
+import '../../../../core/router/app_router.dart';
 import '../../../../core/ui/slide_to_start.dart';
-import '../../domain/entities/daily_routine_item.dart';
+import '../../domain/entities/daily_routine_activity.dart';
 import '../controllers/daily_routine_controller.dart';
+import '../models/routine_meditation_args.dart';
+import '../../../../features/breathing/presentation/controllers/breathing_controller.dart';
 
 class DailyRoutinePage extends StatefulWidget {
   const DailyRoutinePage({super.key});
@@ -16,12 +21,6 @@ class DailyRoutinePage extends StatefulWidget {
 
 class _DailyRoutinePageState extends State<DailyRoutinePage> {
   late final DailyRoutineController _controller;
-
-  static const _sectionTitles = [
-    'Morning meditation',
-    'Afternoon breathing',
-    'Evening relaxation',
-  ];
 
   static const _sectionImages = [
     'assets/images/morning_meditation.png',
@@ -37,8 +36,6 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -66,28 +63,40 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+             
+           
                 Expanded(
-                  child: ListView.separated(
-                    physics: const BouncingScrollPhysics(),
-                    padding: EdgeInsets.zero,
-                    itemCount: _controller.routineItems.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 18),
-                    itemBuilder: (context, index) {
-                      final item = _controller.routineItems[index];
-                      final image = _sectionImages[index];
-                      final title = _sectionTitles[index];
-                      if (index == 1) {
-                        return _BreathingCard(
-                          item: item,
-                          imageAsset: image,
-                          color: const Color.fromRGBO(119, 201, 126, 0.16),
-                          durationLabel: '${item.durationMinutes} min',
-                        );
+                  child: Watch(
+                    (context) {
+                      final items = _controller.routineItems.value;
+                      if (items.isEmpty) {
+                        return const Center(child: CircularProgressIndicator());
                       }
-                      return _MeditationCard(
-                        item: item,
-                        imageAsset: image,
-                        title: title,
+                      return ListView.separated(
+                        physics: const BouncingScrollPhysics(),
+                        padding: EdgeInsets.zero,
+                        itemCount: items.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 18),
+                        itemBuilder: (context, index) {
+                          final item = items[index];
+                          final image = _sectionImages[index];
+                          return InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () => _onCardTap(item),
+                            child: item is DailyRoutineBreathing
+                                ? _BreathingCard(
+                                    item: item,
+                                    imageAsset: image,
+                                    color:
+                                        const Color.fromRGBO(119, 201, 126, 0.16),
+                                    durationLabel: '${item.durationMinutes} min',
+                                  )
+                                : _MeditationCard(
+                                    item: item as DailyRoutineMeditation,
+                                    imageAsset: image,
+                                  ),
+                          );
+                        },
                       );
                     },
                   ),
@@ -96,7 +105,9 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                 SlideToStart(
                   label: 'START',
                   onComplete: () async {
-                    await _controller.completeRoutine();
+                    await _controller.completeRoutine(
+                      nextDay: DateTime.now().add(const Duration(days: 1)),
+                    );
                     if (!mounted) return;
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
@@ -105,10 +116,10 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                     );
                   },
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 TextButton(
                   onPressed: () {},
-                  child:  Text(
+                  child: Text(
                     'Mark as done'.toUpperCase(),
                     style: GoogleFonts.funnelDisplay(
                       letterSpacing: -1,
@@ -124,26 +135,43 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
       ),
     );
   }
+
+  void _onCardTap(DailyRoutineActivity activity) {
+    if (activity is DailyRoutineMeditation) {
+      final args = RoutineMeditationArgs(
+        title: activity.title,
+        goal: activity.goal,
+        durationMinutes: activity.durationMinutes,
+        voiceStyle: activity.voiceStyle,
+        backgroundSound: activity.backgroundSound,
+      );
+      context.push(AppRoutes.player, extra: args);
+      return;
+    }
+
+    if (activity is DailyRoutineBreathing) {
+      final breathingController = getIt<BreathingController>();
+      breathingController.updateMood(activity.badgeText);
+      breathingController.updateDuration(activity.durationMinutes);
+      context.push(AppRoutes.breathingSession);
+    }
+  }
 }
 
 class _MeditationCard extends StatelessWidget {
   const _MeditationCard({
     required this.item,
     required this.imageAsset,
-    required this.title,
   });
 
-  final DailyRoutineItem item;
+  final DailyRoutineMeditation item;
   final String imageAsset;
-  final String title;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return Column(
       children: [
-        _DailyRoutineHeader(title: title),
+        _DailyRoutineHeader(title: item.title),
         const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
@@ -210,7 +238,7 @@ class _MeditationCard extends StatelessWidget {
                       style: GoogleFonts.funnelDisplay(
                         fontSize: 14,
                         height: 20 / 14,
-                        color: Color(0xffAAAEBA),
+                        color: const Color(0xffAAAEBA),
                         letterSpacing: -0.5,
                         fontWeight: FontWeight.w700,
                       ),
@@ -234,14 +262,13 @@ class _BreathingCard extends StatelessWidget {
     required this.durationLabel,
   });
 
-  final DailyRoutineItem item;
+  final DailyRoutineBreathing item;
   final String imageAsset;
   final Color color;
   final String durationLabel;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final imageBackground = Container(
       width: 88,
       height: 88,
@@ -271,12 +298,14 @@ class _BreathingCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      "RELAX",
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                Text(
+                  item.title,
+                  style: GoogleFonts.funnelDisplay(
+                    fontSize: 16,
+                    height: 24 / 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
 
                     const SizedBox(height: 4),
 

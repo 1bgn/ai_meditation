@@ -14,7 +14,9 @@ import '../../features/generation/presentation/pages/'
     'duration_selection_page.dart';
 import '../../features/generation/presentation/pages/generation_page.dart';
 import '../../features/generation/presentation/pages/goal_selection_page.dart';
+import '../../features/daily_routine/presentation/models/routine_meditation_args.dart';
 import '../../features/generation/presentation/pages/meditation_player_page.dart';
+import '../../features/generation/presentation/pages/routine_meditation_launcher.dart';
 import '../../features/generation/presentation/pages/'
     'voice_style_selection_page.dart';
 import '../../features/history/presentation/pages/history_page.dart';
@@ -82,12 +84,15 @@ class AppRouter {
         path: AppRoutes.player,
         builder: (context, state) {
           final args = state.extra;
-          if (args is! MeditationPlayerArgs) {
-            return const _RouteErrorPage(
-              message: 'Missing player arguments.',
-            );
+          if (args is RoutineMeditationArgs) {
+            return RoutineMeditationLauncher(args: args);
           }
-          return MeditationPlayerPage(args: args);
+          if (args is MeditationPlayerArgs) {
+            return MeditationPlayerPage(args: args);
+          }
+          return const _RouteErrorPage(
+            message: 'Missing player arguments.',
+          );
         },
       ),
       GoRoute(
