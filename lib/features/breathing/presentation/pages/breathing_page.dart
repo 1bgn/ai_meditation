@@ -63,7 +63,7 @@ class _BreathingPageState extends State<BreathingPage> {
                 decoration: BoxDecoration(
               
                 ),
-                height: 56,
+                height: 58,
                 child: Stack(
                   children: [
                     Positioned(
