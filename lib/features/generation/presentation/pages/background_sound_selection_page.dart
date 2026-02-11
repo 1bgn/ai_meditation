@@ -11,7 +11,7 @@ import '../controllers/generation_controller.dart';
 class BackgroundSoundSelectionPage extends StatelessWidget {
   const BackgroundSoundSelectionPage({super.key});
 
-  static const _sounds = ['Ocean', 'Rain', 'Forest', 'Silence'];
+  static const _sounds = ['Nature', 'Ambient Music', 'Rain', 'None'];
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +33,8 @@ class BackgroundSoundSelectionPage extends StatelessWidget {
                     child: ConcaveCircleButton(
                       size: 40,
                       svgAssetPath: 'assets/images/back-arrow.svg',
-                      onPressed: () => Navigator.pop(context),),
+                      onPressed: () => Navigator.pop(context),
+                    ),
                   ),
                   Positioned(
                     child: Align(
@@ -69,7 +70,7 @@ class BackgroundSoundSelectionPage extends StatelessWidget {
           Positioned.fill(
             child: Watch(
               (context) => ListView.separated(
-                                  hitTestBehavior: HitTestBehavior.translucent,
+                hitTestBehavior: HitTestBehavior.translucent,
 
                 padding: const EdgeInsets.only(
                   top: 172,
@@ -78,7 +79,8 @@ class BackgroundSoundSelectionPage extends StatelessWidget {
                   bottom: 24,
                 ),
                 itemCount: _sounds.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final sound = _sounds[index];
                   final isSelected =
@@ -140,11 +142,7 @@ class _SelectionOptionTile extends StatelessWidget {
             ),
           ),
           if (isSelected)
-            const Icon(
-              Icons.check,
-              size: 18,
-              color: Colors.black,
-            ),
+            const Icon(Icons.check, size: 18, color: Colors.black),
         ],
       ),
     ),

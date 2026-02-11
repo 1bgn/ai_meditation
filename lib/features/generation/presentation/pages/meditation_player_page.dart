@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'dart:ui' as ui;
 
 import 'package:ai_meditation/core/ui/liquid_glass_circle_icon_buttons.dart';
+import 'package:ai_meditation/features/generation/presentation/pages/background_and_volume_selector_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
@@ -43,7 +44,30 @@ class MeditationPlayerPage extends StatefulWidget {
 
 class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
   late final MeditationPlayerController _controller;
-
+  Future<bool?> _showBackgroundAndVolumeSelectorSheet(
+    BuildContext context, {
+    required int durationMinutes,
+  }) => showModalBottomSheet<bool>(
+    context: context,
+    isScrollControlled: true,
+    isDismissible: true,
+    enableDrag: true,
+    backgroundColor: Colors.transparent,
+    builder: (sheetContext) => ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(32),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.88,
+        child: BackgroundAndVolumeSelectorPage(
+          durationMinutes: durationMinutes,
+          onClose: () => Navigator.of(sheetContext).pop(false),
+          onStart: () => Navigator.of(sheetContext).pop(true),
+        ),
+      ),
+    ),
+  );
   @override
   void initState() {
     super.initState();
@@ -183,7 +207,13 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
                         leading: SvgPicture.asset(
                           "assets/images/sound_list.svg",
                         ),
-                        onTap: () {},
+                        onTap: () {
+                          _showBackgroundAndVolumeSelectorSheet(
+                            context,
+                            durationMinutes:
+                                _controller.duration.value.inSeconds,
+                          );
+                        },
                         child: Row(
                           children: [
                             Wrap(

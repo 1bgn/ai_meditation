@@ -42,10 +42,10 @@ class MeditationPlayerController {
             voiceStyle: voiceStyle,
           );
       await _player.setAudioSource(source);
-      await _player.play();
+      _player.play();
 
       // Start background sound if selected
-      if (backgroundSound != null && backgroundSound != 'Silence') {
+      if (backgroundSound != null && backgroundSound != 'None') {
         await _startBackgroundSound(backgroundSound);
       }
     } catch (e) {
@@ -60,6 +60,8 @@ class MeditationPlayerController {
         'Ocean': 'assets/sounds/ocean_sound.wav',
         'Rain': 'assets/sounds/rain_sound.wav',
         'Forest': 'assets/sounds/forest_sound.wav',
+        'Nature': 'assets/sounds/nature_sound.wav',
+        'Ambient music': 'assets/sounds/ambient_sound.wav',
       };
 
       final soundFile = backgroundSoundMap[backgroundSound];
@@ -80,11 +82,14 @@ class MeditationPlayerController {
     print("_player.playing ${_player.playing}");
     print("_backgroundSoundPlayer.playing ${_backgroundSoundPlayer.playing}");
     if (isPlaying.value) {
-      await _backgroundSoundPlayer.pause();
-      await _player.pause();
+      print("ON PAUSE");
+      _player.pause();
+      _backgroundSoundPlayer.pause();
     } else {
-      await _backgroundSoundPlayer.play();
-      await _player.play();
+      print("ON PLAY");
+      // When resuming, ensure both players are at the same position
+      _player.play();
+      _backgroundSoundPlayer.play();
     }
   }
 
