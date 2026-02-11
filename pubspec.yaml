@@ -50,6 +50,7 @@ dependencies:
   just_audio: ^0.10.5
   path_provider: ^2.1.5
   audio_session: ^0.2.2
+
   google_fonts: ^8.0.1
   flutter_svg: ^2.2.3
   flutter_inset_shadow: ^2.0.3
@@ -84,11 +85,13 @@ flutter:
     - assets/kokoro/
     - assets/images/
     - assets/fonts/
+    - assets/sounds/
     - assets/tokenizer_vocab.json
     - assets/us_gold.json
     - assets/us_silver.json
     - assets/gb_gold.json
     - assets/gb_silver.json
+    
 
   # To add assets to your application, add an assets section, like this:
   # assets:

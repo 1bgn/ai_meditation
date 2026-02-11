@@ -22,6 +22,7 @@ class MeditationPlayerArgs {
     required this.durationMinutes,
     required this.voiceStyle,
     required this.backgroundSound,
+    required this.durationTrack,
     this.preloadedSource,
   });
 
@@ -31,6 +32,7 @@ class MeditationPlayerArgs {
   final String voiceStyle;
   final String backgroundSound;
   final AudioSource? preloadedSource;
+  final Duration durationTrack;
 }
 
 class MeditationPlayerPage extends StatefulWidget {
@@ -62,6 +64,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
         height: MediaQuery.of(context).size.height * 0.88,
         child: BackgroundAndVolumeSelectorPage(
           durationMinutes: durationMinutes,
+          controller: _controller,
           onClose: () => Navigator.of(sheetContext).pop(false),
           onStart: () => Navigator.of(sheetContext).pop(true),
         ),
@@ -74,6 +77,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
     _controller = getIt<MeditationPlayerController>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.start(
+        durationTrack: widget.args.durationTrack,
         script: widget.args.script,
         voiceStyle: widget.args.voiceStyle,
         preloadedSource: widget.args.preloadedSource,
@@ -85,180 +89,227 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
   @override
   void dispose() {
     _controller.dispose();
+    getIt.resetLazySingleton(instance: _controller);
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-    body: Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset("assets/images/place.jpg", fit: BoxFit.cover),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: 387,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(1),
-                      Colors.black.withOpacity(0.0),
-                    ],
-                    stops: [0.0, 1.0],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Scaffold(
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: Image.asset("assets/images/place.jpg", fit: BoxFit.cover),
+            ),
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  height: 387,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        Colors.black.withOpacity(1),
+                        Colors.black.withOpacity(0.0),
+                      ],
+                      stops: [0.0, 1.0],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
                   ),
-                ),
-                child: ClipRRect(
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: .0, sigmaY: 3.0),
-                    child: Container(),
+                  child: ClipRRect(
+                    child: BackdropFilter(
+                      filter: ui.ImageFilter.blur(sigmaX: .0, sigmaY: 3.0),
+                      child: Container(),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
 
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 16.0,
-                    left: 16,
-                    right: 16,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      LiquidGlassCircleIconButton(
-                        svgAssetIcon: "assets/images/close.svg",
-                        onTap: () {
-                          context.pop();
-                        },
-                        radius: 22,
-                      ),
-                      LiquidGlassCircleIconButton(
-                        svgAssetIcon: "assets/images/like.svg",
-                        onTap: () {},
-                        radius: 22,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 358),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    LiquidGlassCircleIconButton(
-                      svgAssetIcon: "assets/images/white_back_15.svg",
-                      onTap: () =>
-                          _controller.seekBy(const Duration(seconds: -15)),
-                      radius: 22,
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: 16.0,
+                      left: 16,
+                      right: 16,
                     ),
-                    const SizedBox(width: 17),
-                    Watch(
-                      (context) => LiquidGlassCircleIconButton(
-                        onTap: _controller.togglePlayPause,
-                        iconSize: 24,
-                        svgAssetIcon: "assets/images/white_play.svg",
-                        radius: 48,
-                      ),
-                    ),
-                    const SizedBox(width: 17),
-                    LiquidGlassCircleIconButton(
-                      svgAssetIcon: "assets/images/white_next_15.svg",
-                      onTap: () =>
-                          _controller.seekBy(const Duration(seconds: 15)),
-                      radius: 22,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(
-                    top: 16.0,
-                    left: 16,
-                    right: 16,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      LiquidGlassPillButton2(
-                        leading: SvgPicture.asset(
-                          "assets/images/sound_list.svg",
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        LiquidGlassCircleIconButton(
+                          svgAssetIcon: "assets/images/close.svg",
+                          onTap: () {
+                            context.pop();
+                          },
+                          radius: 22,
                         ),
-                        onTap: () {
-                          _showBackgroundAndVolumeSelectorSheet(
-                            context,
-                            durationMinutes:
-                                _controller.duration.value.inSeconds,
-                          );
-                        },
-                        child: Row(
-                          children: [
-                            Wrap(
-                              direction: Axis.vertical,
+                        LiquidGlassCircleIconButton(
+                          svgAssetIcon: "assets/images/like.svg",
+                          onTap: () {},
+                          radius: 22,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 358),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      LiquidGlassCircleIconButton(
+                        svgAssetIcon: "assets/images/white_back_15.svg",
+                        onTap: () =>
+                            _controller.seekBy(const Duration(seconds: -15)),
+                        radius: 22,
+                      ),
+                      const SizedBox(width: 17),
+                      Watch(
+                        (context) => LiquidGlassCircleIconButton(
+                          onTap: _controller.togglePlayPause,
+                          iconSize: 24,
+                          svgAssetIcon: "assets/images/white_play.svg",
+                          radius: 48,
+                        ),
+                      ),
+                      const SizedBox(width: 17),
+                      LiquidGlassCircleIconButton(
+                        svgAssetIcon: "assets/images/white_next_15.svg",
+                        onTap: () =>
+                            _controller.seekBy(const Duration(seconds: 15)),
+                        radius: 22,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned.fill(
+              top: 562,
+              left: 16,
+              right: 16,
+              child: Watch((context) {
+                return Align(
+                  child: SliderTheme(
+                    data: SliderThemeData(
+                      padding: EdgeInsets.zero,
+                      activeTrackColor: Colors.white,
+                      inactiveTrackColor: Colors.white.withOpacity(0.08),
+                      thumbColor: Colors.white,
+                      overlayColor: Colors.black.withOpacity(0.16),
+                      overlayShape: const RoundSliderOverlayShape(
+                        overlayRadius: 14,
+                      ),
+                      trackHeight: 6,
+                      thumbShape: const RoundSliderThumbShape(
+                        enabledThumbRadius: 8,
+                      ),
+                    ),
+                    child: Slider(
+                      value: _controller.position.value.inSeconds * 1.0,
+                      min: 0.0,
+                      max: _controller.trackDuration.value.inSeconds * 1.0,
+
+                      onChanged: (value) {
+                        _controller.seek(value.toInt());
+                        setState(() {
+                          // _volume = value;
+                        });
+                      },
+                    ),
+                  ),
+                );
+              }),
+            ),
+
+            Positioned.fill(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(
+                      top: 16.0,
+                      left: 16,
+                      right: 16,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        LiquidGlassPillButton2(
+                          leading: SvgPicture.asset(
+                            "assets/images/sound_list.svg",
+                          ),
+                          onTap: () {
+                            _showBackgroundAndVolumeSelectorSheet(
+                              context,
+                              durationMinutes:
+                                  _controller.duration.value.inSeconds,
+                            );
+                          },
+                          child: Watch((context) {
+                            return Row(
                               children: [
-                                Text(
-                                  "Backgroudn sounds",
-                                  style: GoogleFonts.funnelDisplay(
-                                    fontSize: 12,
-                                    letterSpacing: -0.5,
-                                    height: 18 / 12,
-                                    color: Color.fromRGBO(255, 255, 215, 0.32),
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                                Text(
-                                  "${"Ambient"} music",
-                                  style: GoogleFonts.funnelDisplay(
-                                    fontSize: 16,
-                                    letterSpacing: -0.5,
-                                    height: 24 / 16,
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                                Wrap(
+                                  direction: Axis.vertical,
+                                  children: [
+                                    Text(
+                                      "Backgroudn sounds",
+                                      style: GoogleFonts.funnelDisplay(
+                                        fontSize: 12,
+                                        letterSpacing: -0.5,
+                                        height: 18 / 12,
+                                        color: Color.fromRGBO(
+                                          255,
+                                          255,
+                                          215,
+                                          0.32,
+                                        ),
+                                        fontWeight: FontWeight.w400,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${_controller.backgroundSound.value}",
+                                      style: GoogleFonts.funnelDisplay(
+                                        fontSize: 16,
+                                        letterSpacing: -0.5,
+                                        height: 24 / 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
-                            ),
-                          ],
+                            );
+                          }),
                         ),
-                      ),
-                      LiquidGlassCircleIconButton(
-                        svgAssetIcon: "assets/images/white_share.svg",
-                        onTap: () {},
-                        radius: 22,
-                      ),
-                    ],
+                        LiquidGlassCircleIconButton(
+                          svgAssetIcon: "assets/images/white_share.svg",
+                          onTap: () {},
+                          radius: 22,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 }
 
 class _SeekIcon extends StatelessWidget {

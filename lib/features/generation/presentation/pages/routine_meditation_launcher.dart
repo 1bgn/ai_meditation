@@ -27,30 +27,27 @@ class RoutineMeditationLauncher extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => FutureBuilder<String>(
-        future: _buildScript(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Scaffold(
-              body: Center(child: CircularProgressIndicator()),
-            );
-          }
-          if (snapshot.hasError) {
-            final message = snapshot.error.toString();
-            return Scaffold(
-              body: Center(
-                child: FeatureErrorWidget(error: message),
-              ),
-            );
-          }
-          final script = snapshot.data ?? '';
-          final playerArgs = MeditationPlayerArgs(
-            title: args.title,
-            script: script,
-            durationMinutes: args.durationMinutes,
-            voiceStyle: args.voiceStyle,
-            backgroundSound: args.backgroundSound,
-          );
-          return MeditationPlayerPage(args: playerArgs);
-        },
+    future: _buildScript(),
+    builder: (context, snapshot) {
+      if (snapshot.connectionState != ConnectionState.done) {
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
+      if (snapshot.hasError) {
+        final message = snapshot.error.toString();
+        return Scaffold(
+          body: Center(child: FeatureErrorWidget(error: message)),
+        );
+      }
+      final script = snapshot.data ?? '';
+      final playerArgs = MeditationPlayerArgs(
+        title: args.title,
+        script: script,
+        durationTrack: Duration(),
+        durationMinutes: args.durationMinutes,
+        voiceStyle: args.voiceStyle,
+        backgroundSound: args.backgroundSound,
       );
+      return MeditationPlayerPage(args: playerArgs);
+    },
+  );
 }

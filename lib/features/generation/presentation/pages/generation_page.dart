@@ -67,7 +67,8 @@ class _GenerationPageState extends State<GenerationPage> {
           durationMinutes: _controller.options.value.durationMinutes!,
           voiceStyle: _controller.options.value.voiceStyle!,
           backgroundSound: _controller.options.value.backgroundSound!,
-          preloadedSource: source,
+          preloadedSource: source.$1,
+          durationTrack: source.$2,
         ),
       );
     } catch (e) {
@@ -77,26 +78,24 @@ class _GenerationPageState extends State<GenerationPage> {
     }
   }
 
-  Future<void> _showSelectionSheet(
-    BuildContext context,
-    Widget child,
-  ) => showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    isDismissible: false,
-    enableDrag: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.88,
-        child: child,
-      ),
-    ),
-  );
+  Future<void> _showSelectionSheet(BuildContext context, Widget child) =>
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        isDismissible: false,
+        enableDrag: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.88,
+            child: child,
+          ),
+        ),
+      );
 
   Future<bool?> _showGeneratedMeditationSheet(
     BuildContext context, {
@@ -147,10 +146,7 @@ class _GenerationPageState extends State<GenerationPage> {
                 gradient: LinearGradient(
                   begin: AlignmentGeometry.topCenter,
                   end: AlignmentGeometry.bottomCenter,
-                  colors: [
-                    Color(0xffF3F4F8),
-                    Color(0xffF3F4F8).withAlpha(0),
-                  ],
+                  colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
                 ),
               ),
             ),
@@ -167,10 +163,14 @@ class _GenerationPageState extends State<GenerationPage> {
                     Positioned(
                       top: 18,
                       left: 23,
-                      child: ConcaveCircleButton(onPressed: (){
-                        Navigator.pop(context);
-                      },svgAssetPath: "assets/images/close.svg",)),
-                    
+                      child: ConcaveCircleButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        svgAssetPath: "assets/images/close.svg",
+                      ),
+                    ),
+
                     Positioned(
                       child: Align(
                         alignment: Alignment.topCenter,
@@ -265,28 +265,35 @@ class _GenerationPageState extends State<GenerationPage> {
                       const SizedBox(height: 24),
                       SafeArea(
                         bottom: true,
-                        child: Watch(
-                          (context) {
-                            final isBusy = _controller.isGenerating.value ||
-                                _isPreparingAudio.value;
-                            final buttonLabel = _controller.isGenerating.value
-                                ? 'GENERATING...'
-                                : _isPreparingAudio.value
-                                    ? 'PREPARING AUDIO...'
-                                    : 'GENERATE';
-                            return SizedBox(
-                              height: 96,
-                              child: Center(
-                                child: SlideToStart(
-                                  enabled: !isBusy&&_controller.options.value.goal!=null&&_controller.options.value.durationMinutes!=null&&_controller.options.value.voiceStyle!=null&&_controller.options.value.backgroundSound!=null,
-                                  label: buttonLabel,
-                                  onComplete: () =>
-                                      _generateAndOpenPlayer(context),
-                                ),
+                        child: Watch((context) {
+                          final isBusy =
+                              _controller.isGenerating.value ||
+                              _isPreparingAudio.value;
+                          final buttonLabel = _controller.isGenerating.value
+                              ? 'GENERATING...'
+                              : _isPreparingAudio.value
+                              ? 'PREPARING AUDIO...'
+                              : 'GENERATE';
+                          return SizedBox(
+                            height: 96,
+                            child: Center(
+                              child: SlideToStart(
+                                enabled:
+                                    !isBusy &&
+                                    _controller.options.value.goal != null &&
+                                    _controller.options.value.durationMinutes !=
+                                        null &&
+                                    _controller.options.value.voiceStyle !=
+                                        null &&
+                                    _controller.options.value.backgroundSound !=
+                                        null,
+                                label: buttonLabel,
+                                onComplete: () =>
+                                    _generateAndOpenPlayer(context),
                               ),
-                            );
-                          },
-                        ),
+                            ),
+                          );
+                        }),
                       ),
                     ],
                   ),
@@ -465,7 +472,6 @@ class _GeneratedMeditationSheet extends StatelessWidget {
       color: Colors.white,
       child: Stack(
         children: [
-         
           Positioned(
             child: Align(
               alignment: Alignment.topCenter,
@@ -504,7 +510,9 @@ class _GeneratedMeditationSheet extends StatelessWidget {
                           alignment: Alignment.topCenter,
                           child: Padding(
                             padding: const EdgeInsets.only(top: 8),
-                            child: SvgPicture.asset('assets/images/grabber.svg'),
+                            child: SvgPicture.asset(
+                              'assets/images/grabber.svg',
+                            ),
                           ),
                         ),
                       ),
@@ -537,10 +545,7 @@ class _GeneratedMeditationSheet extends StatelessWidget {
                     child: SizedBox(
                       height: 189,
                       width: double.infinity,
-                      child: Image.asset(
-                        imagePath,
-                        fit: BoxFit.cover,
-                      ),
+                      child: Image.asset(imagePath, fit: BoxFit.cover),
                     ),
                   ),
                 ),
