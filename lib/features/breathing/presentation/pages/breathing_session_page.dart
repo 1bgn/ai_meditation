@@ -1,4 +1,6 @@
+import 'package:ai_meditation/core/ui/concave_circle_button.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
@@ -31,52 +33,101 @@ class _BreathingSessionPageState extends State<BreathingSessionPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Breathing Session')),
-        body: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              Watch(
-                (context) => Text(
-                  _controller.isInhale.value ? 'Inhale' : 'Exhale',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
+    body: Watch((context) {
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: Align(
+              child: Image.asset(
+                "assets/images/breath_session_img.png",
+                fit: BoxFit.cover,
               ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Center(
-                  child: Watch(
-                    (context) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 800),
-                      width: _controller.isInhale.value ? 220 : 140,
-                      height: _controller.isInhale.value ? 220 : 140,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Watch(
-                (context) => Text(
-                  '${_breathingController.options.value.mood} · '
-                  '${_breathingController.options.value.durationMinutes} min',
-                ),
-              ),
-              const SizedBox(height: 16),
-              Watch(
-                (context) => FilledButton(
-                  onPressed:
-                      _controller.isRunning.value ? _controller.stop : null,
-                  child: Text(
-                    _controller.isRunning.value ? 'Stop' : 'Stopped',
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.center,
+              child: Watch(
+                (context) => AnimatedContainer(
+                  duration: const Duration(milliseconds: 800),
+                  width: _controller.isInhale.value ? 343 : 233,
+                  height: _controller.isInhale.value ? 343 : 233,
+                  decoration: BoxDecoration(),
+                  child: Image.asset("assets/images/breath_img.png"),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.center,
+              child: Image.asset("assets/images/breath_center.png", width: 132),
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.center,
+              child: Text(
+                _controller.isInhale.value ? "Inhale" : "Exhale",
+                style: GoogleFonts.funnelDisplay(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                  fontSize: 24,
+                  height: 32 / 24,
+                  letterSpacing: -1.5,
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topLeft,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 23.65, left: 23.65),
+                  child: ConcaveCircleButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    svgAssetPath: "assets/images/close.svg",
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 48,
+                  left: 23.65,
+                  right: 23.65,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    ConcaveCircleButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      iconSize: 15,
+                      svgAssetPath: "assets/images/volume.svg",
+                    ),
+                    ConcaveCircleButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      iconSize: 15,
+                      svgAssetPath: "assets/images/repeat.svg",
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       );
+    }),
+  );
 }

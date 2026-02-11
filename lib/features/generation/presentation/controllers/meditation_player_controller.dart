@@ -48,7 +48,11 @@ class MeditationPlayerController {
 
             voiceStyle: voiceStyle,
           )).$1;
-      await _player.setAudioSource(source, preload: true);
+      await _player.setAudioSource(
+        source,
+        preload: true,
+        initialPosition: Duration(seconds: 0),
+      );
       _player.play();
 
       // Start background sound if selected
@@ -82,7 +86,7 @@ class MeditationPlayerController {
     await _backgroundSoundPlayer.setAudioSources(
       backgroundSoundMap.values.map((e) => AudioSource.asset(e)).toList(),
     );
-    await _backgroundSoundPlayer.setLoopMode(LoopMode.one);
+    await _backgroundSoundPlayer.setLoopMode(LoopMode.all);
     await _backgroundSoundPlayer.play();
   }
 

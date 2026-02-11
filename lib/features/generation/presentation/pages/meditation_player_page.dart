@@ -285,7 +285,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
                                   direction: Axis.vertical,
                                   children: [
                                     Text(
-                                      "Backgroudn sounds",
+                                      "Background sounds",
                                       style: GoogleFonts.funnelDisplay(
                                         fontSize: 12,
                                         letterSpacing: -0.5,
