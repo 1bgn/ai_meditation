@@ -101,7 +101,7 @@ class TtsService {
 
     // useLazyPreparation полезен при больших списках; это поведение описано в API [web:5].
     final playlist = ConcatenatingAudioSource(
-      useLazyPreparation: true,
+      useLazyPreparation: false,
       children: sources,
     );
 

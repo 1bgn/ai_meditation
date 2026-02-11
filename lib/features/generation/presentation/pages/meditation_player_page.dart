@@ -232,7 +232,28 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
                 );
               }),
             ),
-
+            Positioned.fill(
+              top: 592,
+              left: 16,
+              right: 16,
+              child: Align(
+                child: Watch((context) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "${_controller.readTime(_controller.position.value)}",
+                        style: GoogleFonts.funnelDisplay(color: Colors.white),
+                      ),
+                      Text(
+                        "${_controller.readTime(_controller.trackDuration.value)}",
+                        style: GoogleFonts.funnelDisplay(color: Colors.white),
+                      ),
+                    ],
+                  );
+                }),
+              ),
+            ),
             Positioned.fill(
               child: Align(
                 alignment: Alignment.bottomCenter,

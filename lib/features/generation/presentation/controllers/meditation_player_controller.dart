@@ -48,7 +48,7 @@ class MeditationPlayerController {
 
             voiceStyle: voiceStyle,
           )).$1;
-      await _player.setAudioSource(source);
+      await _player.setAudioSource(source, preload: true);
       _player.play();
 
       // Start background sound if selected

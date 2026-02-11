@@ -136,7 +136,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i934.SaveGenerationOptions>(
       () => _i934.SaveGenerationOptions(gh<_i327.GenerationRepository>()),
     );
-    gh.factory<_i1060.MeditationPlayerController>(
+    gh.lazySingleton<_i1060.MeditationPlayerController>(
       () => _i1060.MeditationPlayerController(gh<_i369.TtsService>()),
     );
     gh.lazySingleton<_i665.HistoryLocalDatasource>(
