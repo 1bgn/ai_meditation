@@ -98,7 +98,7 @@ class GenerationRepositoryImpl implements GenerationRepository {
 }
 
 const _useMockOpenRouter = false;
-const _openRouterModel = 'google/gemma-3n-e2b-it:free';
+const _openRouterModel = 'openrouter/aurora-alpha';
 const _mockScript = '''
 Close your eyes and take a slow breath in.
 

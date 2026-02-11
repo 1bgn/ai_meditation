@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
-import '../../../../core/router/app_router.dart';
 import '../../../breathing/presentation/pages/breathing_page.dart';
 import '../../../generation/presentation/pages/generation_page.dart';
+import '../../../daily_routine/presentation/pages/daily_routine_page.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/recommendation_card.dart';
 
@@ -187,7 +186,7 @@ class _HomePageState extends State<HomePage> {
                                         title: 'Daily Routine'.toUpperCase(),
                                         position: _ActionButtonPosition.bottom,
                                         iconAsset: 'assets/images/daily_routine.svg',
-                                        onPressed: () => context.push(AppRoutes.dailyRoutine),
+                                        onPressed: () => _showRoutineSheet(context),
                                       ),
                                     ),
                                   ],
@@ -317,6 +316,23 @@ void _showBreathingSheet(BuildContext context) {
         child: const BreathingPage(),
       ),
     ),
-    
+  );
+}
+
+void _showRoutineSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => ClipRRect(
+      borderRadius: const BorderRadius.only(
+        topLeft: Radius.circular(32),
+        topRight: Radius.circular(32),
+      ),
+      child: SizedBox(
+        height: MediaQuery.of(context).size.height * 0.9,
+        child: const DailyRoutinePage(),
+      ),
+    ),
   );
 }

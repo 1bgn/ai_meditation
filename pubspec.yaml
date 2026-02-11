@@ -42,6 +42,8 @@ dependencies:
   json_annotation: ^4.9.0
   retrofit: ^4.6.0
   shared_preferences: ^2.5.3
+  liquid_glass_renderer: ^0.2.0-dev.4
+  progressive_blur: ^0.0.2
   signals: ^6.3.0
   signals_flutter: ^6.3.0
   kokoro_tts_flutter: ^0.2.0+1
@@ -50,7 +52,6 @@ dependencies:
   audio_session: ^0.2.2
   google_fonts: ^8.0.1
   flutter_svg: ^2.2.3
-  cupertino_native: ^0.1.1
   flutter_inset_shadow: ^2.0.3
   clay_containers: ^0.3.4
 dev_dependencies:

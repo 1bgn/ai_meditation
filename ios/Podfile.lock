@@ -1,8 +1,6 @@
 PODS:
   - audio_session (0.0.1):
     - Flutter
-  - cupertino_native (0.0.1):
-    - Flutter
   - Flutter (1.0.0)
   - flutter_onnxruntime (0.0.1):
     - Flutter
@@ -21,7 +19,6 @@ PODS:
 
 DEPENDENCIES:
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
-  - cupertino_native (from `.symlinks/plugins/cupertino_native/ios`)
   - Flutter (from `Flutter`)
   - flutter_onnxruntime (from `.symlinks/plugins/flutter_onnxruntime/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/darwin`)
@@ -35,8 +32,6 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   audio_session:
     :path: ".symlinks/plugins/audio_session/ios"
-  cupertino_native:
-    :path: ".symlinks/plugins/cupertino_native/ios"
   Flutter:
     :path: Flutter
   flutter_onnxruntime:
@@ -48,7 +43,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   audio_session: 9bb7f6c970f21241b19f5a3658097ae459681ba0
-  cupertino_native: 1db0611c94f9a9ea28433ed16a344dcb996370b5
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
   flutter_onnxruntime: 744f037980e9fb685736bfeceaf4c2dd8c381f8a
   just_audio: 4e391f57b79cad2b0674030a00453ca5ce817eed

@@ -1,5 +1,13 @@
+import 'dart:ui';
+import 'dart:ui' as ui;
+
+import 'package:ai_meditation/core/ui/liquid_glass_circle_icon_buttons.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:progressive_blur/progressive_blur.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
@@ -25,10 +33,7 @@ class MeditationPlayerArgs {
 }
 
 class MeditationPlayerPage extends StatefulWidget {
-  const MeditationPlayerPage({
-    super.key,
-    required this.args,
-  });
+  const MeditationPlayerPage({super.key, required this.args});
 
   final MeditationPlayerArgs args;
 
@@ -60,95 +65,185 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(
-          title: const Text('Meditation Player'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                widget.args.title,
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${widget.args.durationMinutes} min · '
-                '${widget.args.voiceStyle} · '
-                '${widget.args.backgroundSound}',
-                style: Theme.of(context).textTheme.bodyMedium,
-              ),
-              const SizedBox(height: 32),
-              Watch(
-                (context) => _controller.error.value == null
-                    ? const SizedBox.shrink()
-                    : FeatureErrorWidget(
-                        error: _controller.error.value!,
+    body: Scaffold(
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset("assets/images/place.jpg", fit: BoxFit.cover),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 387,
+                decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.black.withOpacity(1),
+                          Colors.black.withOpacity(0.0),
+                        ],
+                        stops: [0.0, 1.0],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
                       ),
+                    ),
+                child: ClipRRect(
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: .0, sigmaY: 3.0),
+                    child: Container(
+                      
+                    ),
+                  ),
+                ),
               ),
-              const Spacer(),
-              Center(
+            ),
+          ),
+
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16.0,
+                    left: 16,
+                    right: 16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LiquidGlassCircleIconButton(
+                        svgAssetIcon: "assets/images/close.svg",
+                        onTap: () {
+                          context.pop();
+                        },
+                        radius: 22,
+                      ),
+                      LiquidGlassCircleIconButton(
+                        svgAssetIcon: "assets/images/like.svg",
+                        onTap: () {},
+                        radius: 22,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 358),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    IconButton(
-                      onPressed: () =>
+                    LiquidGlassCircleIconButton(
+                      svgAssetIcon: "assets/images/white_back_15.svg",
+                      onTap: () =>
                           _controller.seekBy(const Duration(seconds: -15)),
-                      icon: const _SeekIcon(
-                        icon: Icons.replay,
-                        label: '-15',
-                      ),
+                      radius: 22,
                     ),
-                    const SizedBox(width: 24),
+                    const SizedBox(width: 17),
                     Watch(
-                      (context) => IconButton(
-                        onPressed: _controller.togglePlayPause,
-                        icon: Icon(
-                          _controller.isPlaying.value
-                              ? Icons.pause_circle_filled
-                              : Icons.play_circle_fill,
-                          size: 56,
-                        ),
+                      (context) => LiquidGlassCircleIconButton(
+                        onTap: _controller.togglePlayPause,
+                        iconSize: 24,
+                        svgAssetIcon: "assets/images/white_play.svg",
+                        radius: 48,
                       ),
                     ),
-                    const SizedBox(width: 24),
-                    IconButton(
-                      onPressed: () =>
+                    const SizedBox(width: 17),
+                    LiquidGlassCircleIconButton(
+                      svgAssetIcon: "assets/images/white_next_15.svg",
+                      onTap: () =>
                           _controller.seekBy(const Duration(seconds: 15)),
-                      icon: const _SeekIcon(
-                        icon: Icons.forward,
-                        label: '+15',
-                      ),
+                      radius: 22,
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-            ],
+            ),
           ),
-        ),
-      );
+
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                    top: 16.0,
+                    left: 16,
+                    right: 16,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LiquidGlassPillButton2(
+                        leading: SvgPicture.asset(
+                          "assets/images/sound_list.svg",
+                        ),
+                        onTap: () {},
+                        child: Row(
+                          children: [
+                            Wrap(
+                              direction: Axis.vertical,
+                              children: [
+                                Text(
+                                  "Backgroudn sounds",
+                                  style: GoogleFonts.funnelDisplay(
+                                    fontSize: 12,
+                                    letterSpacing: -0.5,
+                                    height: 18 / 12,
+                                    color: Color.fromRGBO(255, 255, 215, 0.32),
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                                Text(
+                                  "${"Ambient"} music",
+                                  style: GoogleFonts.funnelDisplay(
+                                    fontSize: 16,
+                                    letterSpacing: -0.5,
+                                    height: 24 / 16,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      LiquidGlassCircleIconButton(
+                        svgAssetIcon: "assets/images/white_share.svg",
+                        onTap: () {},
+                        radius: 22,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
+  );
 }
 
 class _SeekIcon extends StatelessWidget {
-  const _SeekIcon({
-    required this.icon,
-    required this.label,
-  });
+  const _SeekIcon({required this.icon, required this.label});
 
   final IconData icon;
   final String label;
 
   @override
   Widget build(BuildContext context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
-        ],
-      );
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      Icon(icon),
+      Text(label, style: Theme.of(context).textTheme.labelSmall),
+    ],
+  );
 }

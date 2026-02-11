@@ -106,6 +106,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           (context) {
                             final value = _controller.pageIndex.value;
                             return SlideToStart(
+                              enabled: true,
                               label: value == _controller.pages.length - 1
                                   ? 'Start now'.toUpperCase()
                                   : 'Next'.toUpperCase(),

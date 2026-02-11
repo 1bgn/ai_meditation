@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
+import '../../../../core/ui/concave_circle_button.dart';
 import '../../../../core/ui/slide_to_start.dart';
 import '../../domain/entities/daily_routine_activity.dart';
 import '../controllers/daily_routine_controller.dart';
@@ -37,100 +38,81 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: const Text('ROUTINE'),
-        centerTitle: true,
-        actions: const [
-          Icon(Icons.favorite_border),
-          SizedBox(width: 12),
-          Icon(Icons.autorenew),
-          SizedBox(width: 16),
-        ],
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFF6F7FB), Color(0xFFFFFFFF)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-             
-           
-                Expanded(
-                  child: Watch(
-                    (context) {
-                      final items = _controller.routineItems.value;
-                      if (items.isEmpty) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      return ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        padding: EdgeInsets.zero,
-                        itemCount: items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 18),
-                        itemBuilder: (context, index) {
-                          final item = items[index];
-                          final image = _sectionImages[index];
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () => _onCardTap(item),
-                            child: item is DailyRoutineBreathing
-                                ? _BreathingCard(
-                                    item: item,
-                                    imageAsset: image,
-                                    color:
-                                        const Color.fromRGBO(119, 201, 126, 0.16),
-                                    durationLabel: '${item.durationMinutes} min',
-                                  )
-                                : _MeditationCard(
-                                    item: item as DailyRoutineMeditation,
-                                    imageAsset: image,
-                                  ),
-                          );
-                        },
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            _RoutineHeader(onClose: () => Navigator.of(context).maybePop()),
+            const SizedBox(height: 24),
+            Expanded(
+              child: Watch(
+                (context) {
+                  final items = _controller.routineItems.value;
+                  if (items.isEmpty) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  return ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.zero,
+                    itemCount: items.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 18),
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      final image = _sectionImages[index];
+                      return InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () => _onCardTap(item),
+                        child: item is DailyRoutineBreathing
+                            ? _BreathingCard(
+                                item: item,
+                                imageAsset: image,
+                                color: const Color.fromRGBO(119, 201, 126, 0.16),
+                                durationLabel: '${item.durationMinutes} min',
+                              )
+                            : _MeditationCard(
+                                item: item as DailyRoutineMeditation,
+                                imageAsset: image,
+                              ),
                       );
                     },
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SlideToStart(
-                  label: 'START',
-                  onComplete: () async {
-                    await _controller.completeRoutine(
-                      nextDay: DateTime.now().add(const Duration(days: 1)),
-                    );
-                    if (!mounted) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Daily routine saved to history'),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 12),
-                TextButton(
-                  onPressed: () {},
-                  child: Text(
-                    'Mark as done'.toUpperCase(),
-                    style: GoogleFonts.funnelDisplay(
-                      letterSpacing: -1,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
-                  ),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-          ),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: SlideToStart(
+                label: 'START',
+                enabled: true,
+                onComplete: () async {
+                  await _controller.completeRoutine(
+                    nextDay: DateTime.now().add(const Duration(days: 1)),
+                  );
+                  if (!mounted) return;
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Daily routine saved to history'),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () {},
+              child: Text(
+                'Mark as done'.toUpperCase(),
+                style: GoogleFonts.funnelDisplay(
+                  letterSpacing: -1,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
         ),
       ),
     );
@@ -364,9 +346,57 @@ class _BreathingCard extends StatelessWidget {
   }
 }
 
+class _RoutineHeader extends StatelessWidget {
+  const _RoutineHeader({required this.onClose});
+
+  final VoidCallback onClose;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 58,
+        child: Stack(
+          children: [
+            Positioned(
+              top: 18,
+              left: 23,
+              child: ConcaveCircleButton(
+                onPressed: onClose,
+                svgAssetPath: 'assets/images/close.svg',
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: SvgPicture.asset('assets/images/grabber.svg'),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(top: 24),
+                child: Text(
+                  'Routine'.toUpperCase(),
+                  style: GoogleFonts.funnelDisplay(
+                    fontSize: 16,
+                    height: 24 / 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: -0.5,
+                    color: Colors.black,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+}
+
 class _DailyRoutineHeader extends StatelessWidget {
-  final String title;
   const _DailyRoutineHeader({required this.title});
+
+  final String title;
+
   @override
   Widget build(BuildContext context) {
     return Container(
