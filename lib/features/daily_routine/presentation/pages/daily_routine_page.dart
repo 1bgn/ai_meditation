@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -38,16 +40,18 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xffF6F7FA),
       body: SafeArea(
+        bottom: false,
         child: Column(
           children: [
             const SizedBox(height: 16),
             _RoutineHeader(onClose: () => Navigator.of(context).maybePop()),
             const SizedBox(height: 24),
             Expanded(
-              child: Watch(
-                (context) {
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Watch((context) {
                   final items = _controller.routineItems.value;
                   if (items.isEmpty) {
                     return const Center(child: CircularProgressIndicator());
@@ -67,7 +71,12 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                             ? _BreathingCard(
                                 item: item,
                                 imageAsset: image,
-                                color: const Color.fromRGBO(119, 201, 126, 0.16),
+                                color: const Color.fromRGBO(
+                                  119,
+                                  201,
+                                  126,
+                                  0.16,
+                                ),
                                 durationLabel: '${item.durationMinutes} min',
                               )
                             : _MeditationCard(
@@ -77,41 +86,55 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
                       );
                     },
                   );
-                },
+                }),
               ),
             ),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: SlideToStart(
-                label: 'START',
-                enabled: true,
-                onComplete: () async {
-                  await _controller.completeRoutine(
-                    nextDay: DateTime.now().add(const Duration(days: 1)),
-                  );
-                  if (!mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Daily routine saved to history'),
+            const SizedBox(height: 6),
+
+            Container(
+              decoration: BoxDecoration(
+                color: Color(0xffF6F7FA).withOpacity(0.92),
+                border: Border.all(color: Colors.white, width: 1),
+                borderRadius: BorderRadius.all(Radius.circular(24)),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 16),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SlideToStart(
+                      label: 'START',
+                      enabled: true,
+                      onComplete: () async {
+                        await _controller.completeRoutine(
+                          nextDay: DateTime.now().add(const Duration(days: 1)),
+                        );
+                        if (!mounted) return;
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Daily routine saved to history'),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                  const SizedBox(height: 16),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      'Mark as done'.toUpperCase(),
+                      style: GoogleFonts.funnelDisplay(
+                        letterSpacing: -1,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: () {},
-              child: Text(
-                'Mark as done'.toUpperCase(),
-                style: GoogleFonts.funnelDisplay(
-                  letterSpacing: -1,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
           ],
         ),
       ),
@@ -141,10 +164,7 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
 }
 
 class _MeditationCard extends StatelessWidget {
-  const _MeditationCard({
-    required this.item,
-    required this.imageAsset,
-  });
+  const _MeditationCard({required this.item, required this.imageAsset});
 
   final DailyRoutineMeditation item;
   final String imageAsset;
@@ -173,6 +193,35 @@ class _MeditationCard extends StatelessWidget {
                       width: 88,
                       height: 88,
                       fit: BoxFit.cover,
+                    ),
+                  ),
+                  Positioned.fill(
+                    child: Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        height: 36,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.black.withOpacity(0.5),
+                              Colors.black.withOpacity(0.0),
+                            ],
+                            stops: [0.0, 1.0],
+                            begin: Alignment.bottomCenter,
+                            end: Alignment.topCenter,
+                          ),
+                        ),
+                        child: ClipRRect(
+                          child: BackdropFilter(
+                            filter: ui.ImageFilter.blur(
+                              sigmaX: 1.0,
+                              sigmaY: 1.0,
+                            ),
+                            child: Container(),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                   Positioned.fill(
@@ -280,14 +329,14 @@ class _BreathingCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                Text(
-                  item.title,
-                  style: GoogleFonts.funnelDisplay(
-                    fontSize: 16,
-                    height: 24 / 16,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
+                    Text(
+                      item.title,
+                      style: GoogleFonts.funnelDisplay(
+                        fontSize: 16,
+                        height: 24 / 16,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
 
                     const SizedBox(height: 4),
 
@@ -305,7 +354,13 @@ class _BreathingCard extends StatelessWidget {
                     RichText(
                       text: TextSpan(
                         text: "Inhale ",
-                        style: GoogleFonts.funnelDisplay(fontSize: 14,height: 20/14,color: Color(0xffAAAEBA),letterSpacing: -0.5,fontWeight: FontWeight.w400),
+                        style: GoogleFonts.funnelDisplay(
+                          fontSize: 14,
+                          height: 20 / 14,
+                          color: Color(0xffAAAEBA),
+                          letterSpacing: -0.5,
+                          fontWeight: FontWeight.w400,
+                        ),
                         children: [
                           TextSpan(
                             text: "4 sec. ",
@@ -327,10 +382,17 @@ class _BreathingCard extends StatelessWidget {
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
-                              TextSpan(text: " 6 sec.",style: GoogleFonts.funnelDisplay(fontSize: 14,height: 20/14,color: Colors.black,letterSpacing: -0.5,fontWeight: FontWeight.w400),),
+                              TextSpan(
+                                text: " 6 sec.",
+                                style: GoogleFonts.funnelDisplay(
+                                  fontSize: 14,
+                                  height: 20 / 14,
+                                  color: Colors.black,
+                                  letterSpacing: -0.5,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
                             ],
-                          
-                         
                           ),
                         ],
                       ),
@@ -353,43 +415,63 @@ class _RoutineHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: 58,
-        child: Stack(
-          children: [
-            Positioned(
-              top: 18,
-              left: 23,
-              child: ConcaveCircleButton(
-                onPressed: onClose,
-                svgAssetPath: 'assets/images/close.svg',
-              ),
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 8),
-                child: SvgPicture.asset('assets/images/grabber.svg'),
-              ),
-            ),
-            Align(
-              alignment: Alignment.topCenter,
-              child: Padding(
-                padding: const EdgeInsets.only(top: 24),
-                child: Text(
-                  'Routine'.toUpperCase(),
-                  style: GoogleFonts.funnelDisplay(
-                    fontSize: 16,
-                    height: 24 / 16,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: -0.5,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-          ],
+    height: 58,
+    child: Stack(
+      children: [
+        Positioned(
+          top: 18,
+          left: 23,
+          child: ConcaveCircleButton(
+            onPressed: onClose,
+            svgAssetPath: 'assets/images/close.svg',
+          ),
         ),
-      );
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: SvgPicture.asset('assets/images/grabber.svg'),
+          ),
+        ),
+        Align(
+          alignment: Alignment.topCenter,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 24),
+            child: Text(
+              'Routine'.toUpperCase(),
+              style: GoogleFonts.funnelDisplay(
+                fontSize: 16,
+                height: 24 / 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: -0.5,
+                color: Colors.black,
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          top: 18,
+          right: 23,
+          child: Wrap(
+            children: [
+              ConcaveCircleButton(
+                onPressed: onClose,
+                svgAssetPath: 'assets/images/like.svg',
+                iconSize: 15,
+              ),
+              SizedBox(width: 8),
+              ConcaveCircleButton(
+                onPressed: onClose,
+                svgAssetPath: 'assets/images/repeat.svg',
+                iconSize: 15,
+              ),
+            ],
+            direction: Axis.horizontal,
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _DailyRoutineHeader extends StatelessWidget {

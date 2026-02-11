@@ -1,4 +1,5 @@
 import 'package:ai_meditation/core/ui/slide_to_start.dart';
+import 'package:ai_meditation/features/breathing/presentation/pages/breathing_congrats.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -29,32 +30,45 @@ class _BreathingPageState extends State<BreathingPage> {
     _controller = getIt<BreathingController>();
   }
 
-  Future<void> _showSelectionSheet(
-    BuildContext context,
-    Widget child,
-  ) => showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.87,
-        child: child,
-      ),
-    ),
-  );
+  Future<void> _showSelectionSheet(BuildContext context, Widget child) =>
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.87,
+            child: child,
+          ),
+        ),
+      );
 
+  Future<void> _showCongratsSheet(BuildContext context) =>
+      showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.87,
+            child: CongratsPage(),
+          ),
+        ),
+      );
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Stack(
       children: [
         Positioned.fill(
           child: ClipRRect(
-
             child: Transform.translate(
               offset: Offset(0, -40),
               child: Image.asset(
@@ -64,25 +78,26 @@ class _BreathingPageState extends State<BreathingPage> {
             ),
           ),
         ),
-        Positioned(child:  Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            height: 112,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: AlignmentGeometry.topCenter,
-                      end: AlignmentGeometry.bottomCenter,
-                      colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
-                    ),
-                  ),),
-        ),),
+        Positioned(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              height: 112,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: AlignmentGeometry.topCenter,
+                  end: AlignmentGeometry.bottomCenter,
+                  colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
+                ),
+              ),
+            ),
+          ),
+        ),
         Positioned.fill(
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(
-              
-                ),
+                decoration: BoxDecoration(),
                 height: 58,
                 child: Stack(
                   children: [
@@ -94,7 +109,6 @@ class _BreathingPageState extends State<BreathingPage> {
                         svgAssetPath: 'assets/images/close.svg',
                         onPressed: () {
                           Navigator.pop(context);
-
                         },
                       ),
                     ),
@@ -154,12 +168,11 @@ class _BreathingPageState extends State<BreathingPage> {
                   ),
                 ],
               ),
-              SizedBox(height: 24,),
+              SizedBox(height: 24),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 17),
                   child: Column(
-                                
                     children: [
                       Watch(
                         (context) => _BreathingOptionsSection(
@@ -175,28 +188,34 @@ class _BreathingPageState extends State<BreathingPage> {
                         ),
                       ),
                       Spacer(),
-                  
+
                       const SizedBox(height: 24),
-                        SafeArea(
-                          bottom: true,
-                          child: Watch(
-                             (context) {
-                              return Container(
-                                height: 96,
-                                child: Center(
-                                  child: SlideToStart(
-                                    enabled: _controller.options.value.mood!=null && _controller.options.value.durationMinutes!=null,
-                                                      label: 'START SESSION',
-                                                      onComplete: () async{
-                                                        context.push(AppRoutes.breathingSession);
-                                                      },
-                                                    ),
-                                ),
-                              );
-                            }
-                          ),
-                        ),
-                    
+                      SafeArea(
+                        bottom: true,
+                        child: Watch((context) {
+                          return Container(
+                            height: 96,
+                            child: Center(
+                              child: SlideToStart(
+                                enabled:
+                                    _controller.options.value.mood != null &&
+                                    _controller.options.value.durationMinutes !=
+                                        null,
+                                label: 'START SESSION',
+                                onComplete: () async {
+                                  context.push(AppRoutes.breathingSession).then(
+                                    (v) {
+                                      if (v != null && v == true) {
+                                        _showCongratsSheet(context);
+                                      }
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          );
+                        }),
+                      ),
                     ],
                   ),
                 ),
@@ -273,7 +292,7 @@ class _BreathingOptionTile extends StatelessWidget {
               ? SvgPicture.asset(svgEnableIconPath)
               : SvgPicture.asset(svgDisableIconPath),
           SizedBox(width: 12),
-    
+
           value != null
               ? Expanded(
                   child: Column(

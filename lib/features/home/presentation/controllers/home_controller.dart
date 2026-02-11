@@ -1,4 +1,5 @@
 import 'package:injectable/injectable.dart';
+import 'package:intl/intl.dart';
 import 'package:signals/signals.dart';
 
 import '../../domain/entities/meditation_recommendation.dart';
@@ -7,10 +8,7 @@ import '../../domain/usecases/get_recommendations.dart';
 
 @injectable
 class HomeController {
-  HomeController(
-    this._getRecommendations,
-    this._getLastMeditation,
-  );
+  HomeController(this._getRecommendations, this._getLastMeditation);
 
   final GetRecommendations _getRecommendations;
   final GetLastMeditation _getLastMeditation;
@@ -21,5 +19,10 @@ class HomeController {
   void load() {
     recommendations.value = _getRecommendations();
     lastMeditationTitle.value = _getLastMeditation();
+  }
+
+  String currentDateString({String locale = 'en_US'}) {
+    final now = DateTime.now();
+    return DateFormat('EEEE, d MMM', locale).format(now);
   }
 }

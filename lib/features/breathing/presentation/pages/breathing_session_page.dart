@@ -21,8 +21,25 @@ class _BreathingSessionPageState extends State<BreathingSessionPage> {
   @override
   void initState() {
     super.initState();
-    _controller = getIt<BreathingSessionController>()..start();
+    _controller = getIt<BreathingSessionController>();
     _breathingController = getIt<BreathingController>();
+
+    // Pass mood and duration from breathing controller to session controller
+    final mood = _breathingController.options.value.mood;
+    final durationMinutes = _breathingController.options.value.durationMinutes;
+    final duration = durationMinutes != null
+        ? Duration(minutes: durationMinutes)
+        : null;
+
+    _controller.start(
+      mood: mood,
+      duration: duration,
+      onSessionEnd: _showCongrats,
+    );
+  }
+
+  void _showCongrats() {
+    Navigator.of(context).pop(true);
   }
 
   @override

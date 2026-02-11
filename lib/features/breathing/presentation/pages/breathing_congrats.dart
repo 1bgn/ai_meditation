@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:ai_meditation/core/ui/slide_to_start.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -13,40 +15,18 @@ import '../controllers/breathing_controller.dart';
 import 'duration_selection_page.dart';
 import 'mood_selection_page.dart';
 
-class BreathingPage extends StatefulWidget {
-  const BreathingPage({super.key});
+class CongratsPage extends StatefulWidget {
+  const CongratsPage({super.key});
 
   @override
-  State<BreathingPage> createState() => _BreathingPageState();
+  State<CongratsPage> createState() => _CongratsPageState();
 }
 
-class _BreathingPageState extends State<BreathingPage> {
-  late final BreathingController _controller;
-
+class _CongratsPageState extends State<CongratsPage> {
   @override
   void initState() {
     super.initState();
-    _controller = getIt<BreathingController>();
   }
-
-  Future<void> _showSelectionSheet(
-    BuildContext context,
-    Widget child,
-  ) => showModalBottomSheet<void>(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.87,
-        child: child,
-      ),
-    ),
-  );
 
   @override
   Widget build(BuildContext context) => Scaffold(
@@ -54,7 +34,6 @@ class _BreathingPageState extends State<BreathingPage> {
       children: [
         Positioned.fill(
           child: ClipRRect(
-
             child: Transform.translate(
               offset: Offset(0, -40),
               child: Image.asset(
@@ -64,25 +43,26 @@ class _BreathingPageState extends State<BreathingPage> {
             ),
           ),
         ),
-        Positioned(child:  Align(
-          alignment: Alignment.topCenter,
-          child: Container(
-            height: 112,
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: AlignmentGeometry.topCenter,
-                      end: AlignmentGeometry.bottomCenter,
-                      colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
-                    ),
-                  ),),
-        ),),
+        Positioned(
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: Container(
+              height: 112,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: AlignmentGeometry.topCenter,
+                  end: AlignmentGeometry.bottomCenter,
+                  colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
+                ),
+              ),
+            ),
+          ),
+        ),
         Positioned.fill(
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(
-              
-                ),
+                decoration: BoxDecoration(),
                 height: 58,
                 child: Stack(
                   children: [
@@ -94,7 +74,6 @@ class _BreathingPageState extends State<BreathingPage> {
                         svgAssetPath: 'assets/images/close.svg',
                         onPressed: () {
                           Navigator.pop(context);
-
                         },
                       ),
                     ),
@@ -140,63 +119,60 @@ class _BreathingPageState extends State<BreathingPage> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 54.25),
                       child: Text(
-                        "Fill in the details below to\ngenerate a breathing exercise",
+                        "Congrats!",
                         textAlign: TextAlign.center,
                         style: GoogleFonts.funnelDisplay(
-                          fontSize: 18,
-                          height: 24 / 18,
+                          fontSize: 32,
+                          height: 40 / 32,
                           color: Colors.black,
-                          letterSpacing: -0.5,
-                          fontWeight: FontWeight.w500,
+                          letterSpacing: -1.5,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
                   ),
                 ],
               ),
-              SizedBox(height: 24,),
+              SizedBox(height: 48),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 17),
+                  padding: const EdgeInsets.only(left: 0),
                   child: Column(
-                                
                     children: [
-                      Watch(
-                        (context) => _BreathingOptionsSection(
-                          options: _controller.options.value,
-                          onMoodTap: () => _showSelectionSheet(
-                            context,
-                            const MoodSelectionPage(),
+                      Row(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16),
+                            child: Text(
+                              "Recommended Sessions",
+                              style: GoogleFonts.funnelDisplay(
+                                fontWeight: FontWeight.w500,
+                                fontSize: 16,
+                                height: 24 / 16,
+                                letterSpacing: -0.5,
+                              ),
+                            ),
                           ),
-                          onDurationTap: () => _showSelectionSheet(
-                            context,
-                            const BreathingDurationSelectionPage(),
-                          ),
-                        ),
+                        ],
                       ),
-                      Spacer(),
-                  
-                      const SizedBox(height: 24),
-                        SafeArea(
-                          bottom: true,
-                          child: Watch(
-                             (context) {
-                              return Container(
-                                height: 96,
-                                child: Center(
-                                  child: SlideToStart(
-                                    enabled: _controller.options.value.mood!=null && _controller.options.value.durationMinutes!=null,
-                                                      label: 'START SESSION',
-                                                      onComplete: () async{
-                                                        context.push(AppRoutes.breathingSession);
-                                                      },
-                                                    ),
-                                ),
-                              );
-                            }
+                      SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  SizedBox(width: 16),
+                                  _RecomentationItem(number: 1),
+                                  _RecomentationItem(number: 2),
+                                  _RecomentationItem(number: 3),
+                                ],
+                              ),
+                            ),
                           ),
-                        ),
-                    
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -209,129 +185,149 @@ class _BreathingPageState extends State<BreathingPage> {
   );
 }
 
-class _BreathingOptionsSection extends StatelessWidget {
-  const _BreathingOptionsSection({
-    required this.options,
-    required this.onMoodTap,
-    required this.onDurationTap,
-  });
+class _RecomentationItem extends StatelessWidget {
+  final int number;
 
-  final BreathingOptions options;
-  final VoidCallback onMoodTap;
-  final VoidCallback onDurationTap;
+  const _RecomentationItem({super.key, required this.number});
 
-  @override
-  Widget build(BuildContext context) => Column(
-    children: [
-      _BreathingOptionTile(
-        svgEnableIconPath: 'assets/images/enable_goal.svg',
-        svgDisableIconPath: 'assets/images/disable_goal.svg',
-        title: 'Mood Check-in',
-        value: options.mood,
-        onTap: onMoodTap,
-      ),
-      const SizedBox(height: 12),
-      _BreathingOptionTile(
-        svgEnableIconPath: 'assets/images/enable_duration.svg',
-        svgDisableIconPath: 'assets/images/disable_duration.svg',
-        title: 'Duration',
-        value: options.durationMinutes != null
-            ? '${options.durationMinutes} min'
-            : null,
-        onTap: onDurationTap,
-      ),
-    ],
-  );
-}
+  String get breathImg {
+    switch (number) {
+      case 1:
+        return 'assets/images/breath1.jpg';
+      case 2:
+        return 'assets/images/breath2.jpg';
+      case 3:
+        return 'assets/images/breath3.jpg';
+      default:
+        return 'assets/images/breath1.jpg';
+    }
+  }
 
-class _BreathingOptionTile extends StatelessWidget {
-  const _BreathingOptionTile({
-    required this.title,
-    required this.value,
-    required this.onTap,
-    required this.svgEnableIconPath,
-    required this.svgDisableIconPath,
-  });
-  final String svgEnableIconPath;
-  final String svgDisableIconPath;
-  final String title;
-  final String? value;
-  final VoidCallback onTap;
+  int get breathTime {
+    switch (number) {
+      case 1:
+        return 3;
+      case 2:
+        return 5;
+      case 3:
+        return 10;
+      default:
+        return 3;
+    }
+  }
 
   @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    child: Container(
-      padding: EdgeInsets.only(left: 8, top: 8, bottom: 8, right: 24),
+  Widget build(BuildContext context) {
+    return Container(
+      width: 157,
+      margin: EdgeInsets.only(right: 8),
+      padding: EdgeInsets.all(4),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
         color: Colors.white,
-        borderRadius: BorderRadius.circular(100),
       ),
-      child: Row(
+      child: Stack(
         children: [
-          value != null
-              ? SvgPicture.asset(svgEnableIconPath)
-              : SvgPicture.asset(svgDisableIconPath),
-          SizedBox(width: 12),
-    
-          value != null
-              ? Expanded(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            title,
-                            style: GoogleFonts.funnelDisplay(
-                              fontSize: 13,
-                              height: 18 / 13,
-                              color: Color(0xffAAAEBA),
-                              letterSpacing: -0.5,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                        ],
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.asset(
+              breathImg,
+              width: 149,
+              height: 243,
+              fit: BoxFit.cover,
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 3),
+                margin: EdgeInsets.only(top: 8, left: 8, right: 8),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: Color(0xff11111129).withOpacity(0.16),
+                ),
+                child: Row(
+                  children: [
+                    SizedBox(width: 22),
+                    SvgPicture.asset("assets/images/breathing_icon.svg"),
+                    SizedBox(width: 6),
+                    Text(
+                      "BREATHING",
+                      style: GoogleFonts.funnelDisplay(
+                        color: Colors.white,
+                        fontSize: 12,
+                        height: 15 / 12,
+                        letterSpacing: -0.5,
                       ),
-                      Row(
-                        children: [
-                          Text(
-                            value!,
-                            style: GoogleFonts.funnelDisplay(
-                              fontSize: 16,
-                              height: 24 / 16,
-                              color: Colors.black,
-                              letterSpacing: -0.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 68,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(0.5),
+                      Colors.black.withOpacity(0.0),
                     ],
-                  ),
-                )
-              : Text(
-                  title,
-                  style: GoogleFonts.funnelDisplay(
-                    fontSize: 16,
-                    height: 24 / 16,
-                    color: Color(0xff90939F),
-                    letterSpacing: -0.5,
-                    fontWeight: FontWeight.w400,
+                    stops: [0.0, 1.0],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
                   ),
                 ),
-          Spacer(),
-          SvgPicture.asset("assets/images/right-arrow.svg"),
+                child: ClipRRect(
+                  child: BackdropFilter(
+                    filter: ui.ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
+                    child: Container(),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomLeft,
+              child: Container(
+                margin: EdgeInsets.only(bottom: 12, left: 16),
+                child: Wrap(
+                  direction: Axis.vertical,
+                  children: [
+                    Text(
+                      "$breathTime MIN",
+                      style: GoogleFonts.funnelDisplay(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        height: 20 / 12,
+                        letterSpacing: -0.5,
+                        color: Colors.white.withOpacity(0.64),
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      "SLEEP",
+                      style: GoogleFonts.funnelDisplay(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        height: 20 / 12,
+                        letterSpacing: -0.5,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
       ),
-    ),
-  );
-
-  // ListTile(
-  // onTap: onTap,
-  // title: Text(title),
-  // subtitle: Text(value),
-  // trailing: const Icon(Icons.chevron_right),
-  // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-  // tileColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-  // )
+    );
+  }
 }
