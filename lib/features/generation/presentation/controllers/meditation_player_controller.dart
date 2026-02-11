@@ -12,8 +12,9 @@ class MeditationPlayerController {
 
   final TtsService _ttsService;
   final AudioPlayer _player = AudioPlayer();
+  final AudioPlayer _backgroundSoundPlayer = AudioPlayer();
 
-  final isPlaying = signal(false);
+  final isPlaying = signal(true);
   final error = signal<String?>(null);
   final position = signal(Duration.zero);
   final duration = signal(Duration.zero);
@@ -26,11 +27,13 @@ class MeditationPlayerController {
     required String script,
     required String voiceStyle,
     AudioSource? preloadedSource,
+    String? backgroundSound,
   }) async {
     error.value = null;
     try {
       _bindPlayerStreams();
-      final source = preloadedSource ??
+      final source =
+          preloadedSource ??
           await _ttsService.buildAudioSource(
             script,
             language: _playerLanguage,
@@ -40,15 +43,47 @@ class MeditationPlayerController {
           );
       await _player.setAudioSource(source);
       await _player.play();
+
+      // Start background sound if selected
+      if (backgroundSound != null && backgroundSound != 'Silence') {
+        await _startBackgroundSound(backgroundSound);
+      }
     } catch (e) {
       error.value = e.toString();
     }
   }
 
+  Future<void> _startBackgroundSound(String backgroundSound) async {
+    try {
+      // Map background sound names to audio files
+      final backgroundSoundMap = {
+        'Ocean': 'assets/sounds/ocean_sound.wav',
+        'Rain': 'assets/sounds/rain_sound.wav',
+        'Forest': 'assets/sounds/forest_sound.wav',
+      };
+
+      final soundFile = backgroundSoundMap[backgroundSound];
+      if (soundFile != null) {
+        await _backgroundSoundPlayer.setAudioSource(
+          AudioSource.asset(soundFile),
+        );
+        _backgroundSoundPlayer.setLoopMode(LoopMode.all);
+        await _backgroundSoundPlayer.play();
+      }
+    } catch (e) {
+      error.value = 'Failed to play background sound: $e';
+    }
+  }
+
   Future<void> togglePlayPause() async {
-    if (_player.playing) {
+    print("isPlaying.value ${isPlaying.value}");
+    print("_player.playing ${_player.playing}");
+    print("_backgroundSoundPlayer.playing ${_backgroundSoundPlayer.playing}");
+    if (isPlaying.value) {
+      await _backgroundSoundPlayer.pause();
       await _player.pause();
     } else {
+      await _backgroundSoundPlayer.play();
       await _player.play();
     }
   }
@@ -62,13 +97,17 @@ class MeditationPlayerController {
     await _player.seek(clamped);
   }
 
-  Future<void> stop() async => _player.stop();
+  Future<void> stop() async {
+    await _player.stop();
+    await _backgroundSoundPlayer.stop();
+  }
 
   void dispose() {
     _positionSub?.cancel();
     _durationSub?.cancel();
     _playingSub?.cancel();
     _player.dispose();
+    _backgroundSoundPlayer.dispose();
   }
 
   void _bindPlayerStreams() {

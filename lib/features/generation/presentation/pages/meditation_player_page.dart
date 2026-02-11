@@ -53,6 +53,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
         script: widget.args.script,
         voiceStyle: widget.args.voiceStyle,
         preloadedSource: widget.args.preloadedSource,
+        backgroundSound: widget.args.backgroundSound,
       );
     });
   }
@@ -77,22 +78,20 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
               child: Container(
                 height: 387,
                 decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        colors: [
-                          Colors.black.withOpacity(1),
-                          Colors.black.withOpacity(0.0),
-                        ],
-                        stops: [0.0, 1.0],
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                      ),
-                    ),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.black.withOpacity(1),
+                      Colors.black.withOpacity(0.0),
+                    ],
+                    stops: [0.0, 1.0],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                ),
                 child: ClipRRect(
                   child: BackdropFilter(
                     filter: ui.ImageFilter.blur(sigmaX: .0, sigmaY: 3.0),
-                    child: Container(
-                      
-                    ),
+                    child: Container(),
                   ),
                 ),
               ),
