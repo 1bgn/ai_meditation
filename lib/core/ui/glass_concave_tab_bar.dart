@@ -160,7 +160,6 @@ class _ConcaveTabItem extends StatelessWidget {
     Widget content;
 
     if (selected) {
-      // ВАЖНО: цвет полупрозрачный, иначе “просвет” пропадёт
       content = LiquidGlass(
         shape: shape,
         glassContainsChild: false,
@@ -168,9 +167,7 @@ class _ConcaveTabItem extends StatelessWidget {
           borderRadius: br,
           child: Container(
             decoration: BoxDecoration(
-              color: const Color(
-                0x18FFFFFF,
-              ), // было 0xffF6F7FA (почти непрозрачно)
+              color: const Color(0x18FFFFFF),
               borderRadius: br,
               border: Border.all(color: borderColor, width: 1),
             ),
@@ -180,7 +177,6 @@ class _ConcaveTabItem extends StatelessWidget {
         ),
       );
     } else {
-      // Не выбран: оставь как тебе нравится (можно ClayContainer/простой контейнер)
       content = Container(
         decoration: BoxDecoration(
           color: Colors.white,

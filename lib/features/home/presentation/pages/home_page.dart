@@ -1,6 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:ai_meditation/core/ui/glass_concave_tab_bar.dart';
+import 'package:ai_meditation/core/ui/tab_bar.dart';
 import 'package:ai_meditation/features/daily_routine/domain/entities/daily_routine_activity.dart';
 import 'package:ai_meditation/features/daily_routine/presentation/pages/start_routine_page.dart';
 import 'package:flutter/material.dart';
@@ -325,7 +326,15 @@ class _HomePageState extends State<HomePage> {
                                         padding: const EdgeInsets.only(
                                           left: 16,
                                         ),
-                                        child: _TabBar(),
+                                        child: MyTabBar(
+                                          selectedIndex: 0,
+                                          tabs: [
+                                            TabItem(title: "Sleep"),
+                                            TabItem(title: "Stress & ANXIENTY"),
+                                            TabItem(title: "Daily meditation"),
+                                          ],
+                                          onTap: onSelectRecomendation,
+                                        ),
                                       ),
                                       SizedBox(height: 12),
                                       Row(
@@ -360,139 +369,11 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 28.0),
-                child: GlassConcaveTabBar(
-                  currentIndex: 0,
-                  onChanged: (i) {},
-                  icons: [
-                    ("assets/images/home.svg", "Home"),
-                    ("assets/images/history.svg", "History"),
-                  ],
-                ),
-              ),
-            ),
-          ),
         ],
       ),
     ),
   );
-}
-
-class _TabBar extends StatefulWidget {
-  @override
-  State<_TabBar> createState() => _TabBarState();
-}
-
-class _TabBarState extends State<_TabBar> {
-  int selectedTab = 0;
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(100)),
-        color: Colors.white,
-      ),
-      padding: EdgeInsets.all(4),
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            _Tab(
-              index: 0,
-              title: "Sleep",
-              isSelected: selectedTab == 0,
-              onTap: (val) {
-                setState(() {
-                  selectedTab = val;
-                });
-              },
-            ),
-            _Tab(
-              index: 1,
-              title: "Stress & ANXIENTY",
-              isSelected: selectedTab == 1,
-              onTap: (val) {
-                setState(() {
-                  selectedTab = val;
-                });
-              },
-            ),
-            _Tab(
-              index: 2,
-              title: "Daily meditation",
-              isSelected: selectedTab == 2,
-              onTap: (val) {
-                setState(() {
-                  selectedTab = val;
-                });
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Tab extends StatelessWidget {
-  final String title;
-  final bool isSelected;
-  final Function(int) onTap;
-  final int index;
-
-  const _Tab({
-    super.key,
-    required this.title,
-    required this.index,
-    required this.isSelected,
-    required this.onTap,
-  });
-  @override
-  Widget build(BuildContext context) {
-    if (!isSelected) {
-      return GestureDetector(
-        onTap: () {
-          onTap(index);
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 21, vertical: 8),
-          child: Center(
-            child: Text(
-              title.toUpperCase(),
-              style: GoogleFonts.funnelDisplay(
-                fontSize: 13,
-                height: 20 / 13,
-                letterSpacing: -0.5,
-                color: Color(0xffAAAEBA),
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 21, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.all(Radius.circular(100)),
-      ),
-      child: Center(
-        child: Text(
-          title.toUpperCase(),
-          style: GoogleFonts.funnelDisplay(
-            fontSize: 13,
-            height: 20 / 13,
-            letterSpacing: -0.5,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
+  void onSelectRecomendation(int index) {}
 }
 
 enum _ActionButtonPosition { top, middle, bottom }

@@ -11,11 +11,13 @@ class ConcaveCircleButton extends StatefulWidget {
     required this.onPressed,
     required this.svgAssetPath,
     this.size = 40,
+    this.iconColor,
   });
 
   final VoidCallback onPressed;
   final String svgAssetPath;
   final double size;
+  final Color? iconColor;
   final double iconSize;
   @override
   State<ConcaveCircleButton> createState() => _ConcaveCircleButtonState();
@@ -43,6 +45,7 @@ class _ConcaveCircleButtonState extends State<ConcaveCircleButton> {
           child: Center(
             child: SvgPicture.asset(
               widget.svgAssetPath,
+              color: widget.iconColor,
               width: widget.iconSize,
               height: widget.iconSize,
             ),
