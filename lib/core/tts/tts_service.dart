@@ -38,12 +38,14 @@ class TtsService {
       _detectLanguage(text, fallback: language),
     );
 
+    final styleKey = _normalizeVoiceStyle(voiceStyle);
+
     final maxChars = normalizedLanguage.startsWith('ru')
         ? _elevenLabsMaxChars
         : _kokoroMaxChars;
 
     final speed = _applyStyleSpeed(
-      voiceStyle,
+      styleKey,
       _rateToSpeed(rate),
       normalizedLanguage,
     );
@@ -53,17 +55,27 @@ class TtsService {
       throw StateError('TTS received empty text.');
     }
 
-    // Если вернёшь ElevenLabs для ru, лучше тоже вернуть Duration (см. ниже).
+    // Если вернёшь ElevenLabs для ru, лучше тоже вернуть Duration.
     // if (normalizedLanguage.startsWith('ru')) {
     //   final src = await _buildElevenLabsSource(chunks, voiceStyle: voiceStyle);
-    //   return (src, Duration.zero);
+    //   return BuiltTts(
+    //     source: src,
+    //     total: Duration.zero,
+    //     chunkDurations: List.filled(chunks.length, Duration.zero),
+    //   );
     // }
 
     await _ensureKokoroInitialized();
 
     final voiceId = _resolveKokoroVoiceId(
-      voiceStyle: voiceStyle,
+      styleKey: styleKey,
       language: normalizedLanguage,
+    );
+
+    // Быстрый дебаг: убедись, что реально меняются voiceId/speed
+    // ignore: avoid_print
+    print(
+      'TTS styleRaw=$voiceStyle styleKey=$styleKey -> voiceId=$voiceId speed=$speed lang=$normalizedLanguage',
     );
 
     final sources = <AudioSource>[];
@@ -83,8 +95,6 @@ class TtsService {
         throw StateError('TTS produced empty audio.');
       }
 
-      // Длительность считаем напрямую по PCM.
-      // samples = pcm.length (Int16), channels=1, sampleRate=result.sampleRate
       final d = _pcmDuration(
         pcmSamples: pcm.length,
         sampleRate: result.sampleRate,
@@ -102,7 +112,6 @@ class TtsService {
       sources.add(AudioSource.file(file.path));
     }
 
-    // useLazyPreparation полезен при больших списках; это поведение описано в API [web:5].
     final playlist = ConcatenatingAudioSource(
       useLazyPreparation: false,
       children: sources,
@@ -179,6 +188,11 @@ class TtsService {
     await _kokoro!.initialize();
     _availableVoices = _kokoro!.getVoices();
     _kokoroReady = true;
+
+    // ignore: avoid_print
+    print(
+      'Kokoro voices loaded: ${_availableVoices.length} -> $_availableVoices',
+    );
   }
 
   Future<void> _configureAudioSession() async {
@@ -219,22 +233,23 @@ class TtsService {
     final totalLength = 44 + dataLength;
 
     final buffer = BytesBuilder();
-    buffer.add(_ascii('RIFF'));
-    buffer.add(_int32LE(totalLength - 8));
-    buffer.add(_ascii('WAVE'));
-    buffer.add(_ascii('fmt '));
-    buffer.add(_int32LE(16));
-    buffer.add(_int16LE(1));
-    buffer.add(_int16LE(numChannels));
-    buffer.add(_int32LE(sampleRate));
-    buffer.add(_int32LE(byteRate));
-    buffer.add(_int16LE(blockAlign));
-    buffer.add(_int16LE(bitsPerSample));
-    buffer.add(_ascii('data'));
-    buffer.add(_int32LE(dataLength));
+    buffer
+      ..add(_ascii('RIFF'))
+      ..add(_int32LE(totalLength - 8))
+      ..add(_ascii('WAVE'))
+      ..add(_ascii('fmt '))
+      ..add(_int32LE(16))
+      ..add(_int16LE(1))
+      ..add(_int16LE(numChannels))
+      ..add(_int32LE(sampleRate))
+      ..add(_int32LE(byteRate))
+      ..add(_int16LE(blockAlign))
+      ..add(_int16LE(bitsPerSample))
+      ..add(_ascii('data'))
+      ..add(_int32LE(dataLength))
+      // view на buffer корректен, потому что Int16List хранится в ByteBuffer.
+      ..add(Uint8List.view(pcm.buffer, pcm.offsetInBytes, dataLength));
 
-    // Важно: view на buffer корректен, потому что Int16List хранится в ByteBuffer.
-    buffer.add(Uint8List.view(pcm.buffer, pcm.offsetInBytes, dataLength));
     return buffer.toBytes();
   }
 
@@ -309,40 +324,89 @@ class TtsService {
   }
 
   String _resolveKokoroVoiceId({
-    required String? voiceStyle,
+    required String styleKey,
     required String language,
   }) {
-    final style = voiceStyle?.toLowerCase();
     final lang = language.toLowerCase();
     final preferred = <String>[];
 
+    // 1) Сначала стиль — чтобы он реально влиял
+    final styleVoices = _styleToKokoroVoices[styleKey];
+    if (styleVoices != null) preferred.addAll(styleVoices);
+
+    // 2) Потом базовый пул по языку (можно расширять под другие языки)
     if (lang.startsWith('en')) preferred.addAll(_enVoices);
 
-    if (style == 'Deep') {
-      preferred.addAll(_deepVoices);
-    } else if (style == 'Warm') {
-      preferred.addAll(_warmVoices);
-    } else if (style == 'Soft') {
-      preferred.addAll(_softVoices);
-    }
-
+    // 3) Выбор по приоритету
     for (final id in preferred) {
       if (_availableVoices.contains(id)) return id;
     }
+
+    // 4) Фолбэки
     if (_availableVoices.contains(_defaultVoice)) return _defaultVoice;
     return _availableVoices.isNotEmpty ? _availableVoices.first : _defaultVoice;
   }
 }
+
+// --------------------------
+// Конфигурация Kokoro
+// --------------------------
 
 const _kokoroModelAsset = 'assets/kokoro/kokoro-v1.0.onnx';
 const _kokoroVoicesAsset = 'assets/kokoro/voices.json';
 const _kokoroLanguageFallback = 'en-us';
 const _kokoroMaxChars = 500;
 
+// Список голосов (пример — сверяй с getVoices()).
+final _enVoices = <String>['af_heart', 'af_sky', 'am_adam', 'am_michael'];
+
+final _softVoices = <String>['af_heart'];
+final _warmVoices = <String>['af_sky'];
+final _deepVoices = <String>['am_adam'];
+final _neutralVoices = <String>['af_sky', 'am_michael'];
+final _meditationVoices = <String>['af_heart', 'af_sky'];
+
+const _defaultVoice = 'af_heart';
+
+// ключи ТОЛЬКО lowercase
+final Map<String, List<String>> _styleToKokoroVoices = {
+  'soft': _softVoices,
+  'warm': _warmVoices,
+  'deep': _deepVoices,
+  'neutral': _neutralVoices,
+  'meditation': _meditationVoices,
+};
+
+// --------------------------
+// Конфигурация ElevenLabs
+// --------------------------
+
 const _elevenLabsMaxChars = 900;
 const _elevenLabsModelId = 'eleven_multilingual_v2';
 const _elevenLabsStability = 0.35;
 const _elevenLabsSimilarity = 0.85;
+
+// Пример ID голосов (берутся из кабинета ElevenLabs).
+const _ruVoiceDefault = 'pNInz6obpgDQGcFmaJgB';
+const _ruVoiceSoft = 'EXAVITQu4vr4xnSDxMaL';
+const _ruVoiceDeep = 'TxGEqnHWrfWFTfGW9XjX';
+
+// ключи ТОЛЬКО lowercase
+const Map<String, String> _styleToElevenLabsVoice = {
+  'soft': _ruVoiceSoft,
+  'deep': _ruVoiceDeep,
+  'warm': _ruVoiceDefault,
+  'neutral': _ruVoiceDefault,
+};
+
+String _resolveElevenLabsVoiceId(String? voiceStyle) {
+  final styleKey = _normalizeVoiceStyle(voiceStyle);
+  return _styleToElevenLabsVoice[styleKey] ?? _ruVoiceDefault;
+}
+
+// --------------------------
+// Общие утилиты
+// --------------------------
 
 double _rateToSpeed(double rate) => (0.5 + rate).clamp(0.5, 2.0).toDouble();
 
@@ -356,30 +420,39 @@ String _detectLanguage(String text, {required String fallback}) {
   return hasCyrillic ? 'ru-ru' : fallback;
 }
 
-final _enVoices = <String>['af_heart', 'af_sky', 'am_adam', 'am_michael'];
-final _softVoices = <String>['af_heart'];
-final _warmVoices = <String>['af_sky'];
-final _deepVoices = <String>['am_adam'];
+/// Нормализуем то, что реально приходит: "Deep"/"deep"/"DEEP"/"Neutra".
+String _normalizeVoiceStyle(String? raw) {
+  final s = (raw ?? '').trim().toLowerCase();
+  if (s.isEmpty) return '';
 
-const _defaultVoice = 'af_heart';
+  // убираем пробелы/символы на всякий случай
+  final cleaned = s.replaceAll(RegExp(r'[^a-z]'), '');
 
-String _resolveElevenLabsVoiceId(String? voiceStyle) {
-  final style = voiceStyle?.toLowerCase();
-  if (style == 'Deep') return _ruVoiceDeep;
-  if (style == 'Soft') return _ruVoiceSoft;
-  return _ruVoiceDefault;
+  switch (cleaned) {
+    case 'deep':
+      return 'deep';
+    case 'soft':
+      return 'soft';
+    case 'warm':
+      return 'warm';
+    case 'neutral':
+    case 'neutra':
+      return 'neutral';
+    case 'meditation':
+      return 'meditation';
+    default:
+      return cleaned;
+  }
 }
 
-const _ruVoiceDefault = 'pNInz6obpgDQGcFmaJgB';
-const _ruVoiceSoft = 'EXAVITQu4vr4xnSDxMaL';
-const _ruVoiceDeep = 'TxGEqnHWrfWFTfGW9XjX';
-
-double _applyStyleSpeed(String? voiceStyle, double baseSpeed, String language) {
+double _applyStyleSpeed(String styleKey, double baseSpeed, String language) {
   if (language.startsWith('ru')) return baseSpeed;
 
-  final style = voiceStyle?.toLowerCase();
-  if (style == 'Soft') return (baseSpeed * 0.85).clamp(0.5, 2.0).toDouble();
-  if (style == 'Neutra') return (baseSpeed * 0.9).clamp(0.5, 2.0).toDouble();
-  if (style == 'Deep') return (baseSpeed * 0.95).clamp(0.5, 2.0).toDouble();
+  if (styleKey == 'soft') return (baseSpeed * 0.85).clamp(0.5, 2.0).toDouble();
+  if (styleKey == 'neutral') {
+    return (baseSpeed * 0.9).clamp(0.5, 2.0).toDouble();
+  }
+  if (styleKey == 'deep') return (baseSpeed * 0.95).clamp(0.5, 2.0).toDouble();
+
   return baseSpeed;
 }
