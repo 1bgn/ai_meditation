@@ -39,7 +39,7 @@ class _ConcaveCircleButtonState extends State<ConcaveCircleButton> {
           height: widget.size - 2,
           width: widget.size - 2,
           borderRadius: (widget.size - 1) / 2,
-          depth: 25,
+          depth: 20,
           curveType: CurveType.concave,
           spread: 40,
           child: Center(
