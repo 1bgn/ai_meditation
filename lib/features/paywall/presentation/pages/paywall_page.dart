@@ -34,11 +34,10 @@ class _PaywallPageState extends State<PaywallPage> {
               ),
               // Main content
               Positioned.fill(
-                child: SafeArea(
-                  bottom: false,
+                child: Padding(
+                  padding: EdgeInsetsGeometry.only(top: 24),
                   child: Column(
                     children: [
-                      // (Опционально) кастомный статус-бар не рисуем: SafeArea уже даст отступ.
                       SizedBox(height: sp(8)),
 
                       // Top block: image + titles
@@ -53,22 +52,34 @@ class _PaywallPageState extends State<PaywallPage> {
                               assetPath: 'assets/images/removal.png',
                             ),
                             SizedBox(height: sp(16)),
-                            Text(
-                              'Meditate with\nconfidence',
+                            RichText(
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontFamily: 'Amstelvar',
-                                fontStyle: FontStyle.italic,
-                                fontWeight: FontWeight.w400,
-                                fontSize: sp(32),
-                                height: 40 / 32,
-                                letterSpacing: sp(-1.5),
-                                color: const Color(0xFF111111),
+                              text: TextSpan(
+                                text: "Unlock Full\n",
+                                children: [
+                                  TextSpan(
+                                    text: "AI Meditation Power",
+                                    style: GoogleFonts.funnelDisplay(
+                                      fontWeight: FontWeight.w600,
+                                      fontStyle: FontStyle.normal,
+                                    ),
+                                  ),
+                                ],
+                                style: TextStyle(
+                                  fontFamily: 'Amstelvar',
+                                  fontStyle: FontStyle.italic,
+                                  fontWeight: FontWeight.w400,
+                                  fontVariations: [FontVariation('wght', 300)],
+                                  fontSize: sp(32),
+                                  height: 40 / 32,
+                                  letterSpacing: sp(-1.5),
+                                  color: const Color(0xFF111111),
+                                ),
                               ),
                             ),
                             SizedBox(height: sp(8)),
                             Text(
-                              'Build a daily habit, reduce stress,\nand sleep better in 7 days.',
+                              'Unlimited guided sessions, personalized AI meditations, track your mindfulness..',
                               textAlign: TextAlign.center,
                               style: GoogleFonts.funnelDisplay(
                                 fontWeight: FontWeight.w400,
@@ -99,26 +110,22 @@ class _PaywallPageState extends State<PaywallPage> {
                           ),
                           child: Column(
                             children: const [
-                              _CheckRow(text: 'Personalized plan'),
-                              _CheckRow(text: 'Guided meditations'),
-                              _CheckRow(text: 'Sleep stories'),
-                              _CheckRow(text: 'Breathing exercises'),
-                              _CheckRow(text: 'Progress tracking'),
+                              _CheckRow(text: 'Personalized Sessions'),
+                              _CheckRow(text: 'Sleep & Relaxation'),
+                              _CheckRow(text: 'Focus & Energy'),
+                              _CheckRow(text: 'Mindfulness Tracking'),
+                              _CheckRow(text: 'Nature & Music Sounds'),
                             ],
                           ),
                         ),
                       ),
-
-                      const Spacer(),
 
                       // Bottom sheet (Frame 3 + Frame 79)
                       _BottomSheet(
                         scale: s,
                         selectedPlan: selectedPlan,
                         onSelect: (i) => setState(() => selectedPlan = i),
-                        onContinue: () {
-                          // TODO: действие кнопки
-                        },
+                        onContinue: () {},
                       ),
                     ],
                   ),
@@ -127,56 +134,6 @@ class _PaywallPageState extends State<PaywallPage> {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-class _BlurBlob extends StatelessWidget {
-  const _BlurBlob({
-    required this.left,
-    required this.top,
-    required this.width,
-    required this.height,
-    required this.color,
-    required this.sigma,
-    required this.scale,
-  });
-
-  final double left;
-  final double top;
-  final double width;
-  final double height;
-  final Color color;
-  final double sigma;
-  final double scale;
-
-  @override
-  Widget build(BuildContext context) {
-    // Чтобы размытие было видно “наружу”, даём запас вокруг фигуры.
-    final pad = (sigma * 0.35) * scale; // эмпирически
-    return Positioned(
-      left: left - pad,
-      top: top - pad,
-      child: ImageFiltered(
-        imageFilter: ImageFilter.blur(
-          sigmaX: sigma * 0.25,
-          sigmaY: sigma * 0.25,
-        ),
-        child: SizedBox(
-          width: width + pad * 2,
-          height: height + pad * 2,
-          child: Center(
-            child: Container(
-              width: width,
-              height: height,
-              decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(height / 2),
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
@@ -203,14 +160,7 @@ class _ImageCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(radius),
         child: Stack(
           children: [
-            Center(
-              child: Image.asset(
-                assetPath,
-                width: size * 0.80,
-                height: size * 0.80,
-                fit: BoxFit.contain,
-              ),
-            ),
+            Center(child: Image.asset(assetPath, fit: BoxFit.contain)),
           ],
         ),
       ),
@@ -281,60 +231,57 @@ class _BottomSheet extends StatelessWidget {
         color: Colors.white.withOpacity(0.48),
         borderRadius: BorderRadius.vertical(top: Radius.circular(sp(40))),
       ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(sp(16), sp(16), sp(16), sp(16)),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _PlanTile(
-                scale: scale,
-                accent: const Color(0xFFCBA7FF),
-                label: 'Weekly',
-                price: r'$3.99 / week',
-                badgeText: '3-day trial',
-                badgeBg: const Color(0xFFCBA7FF).withOpacity(0.10),
-                badgeFg: const Color(0xFFCBA7FF),
-                selected: selectedPlan == 0,
-                onTap: () => onSelect(0),
-                radioSelectedStyle: false,
-              ),
-              SizedBox(height: sp(4)),
-              _PlanTile(
-                scale: scale,
-                accent: const Color(0xFF7ACBFF),
-                label: 'Monthly',
-                price: r'$11.99 / month',
-                badgeText: null,
-                badgeBg: Colors.transparent,
-                badgeFg: Colors.transparent,
-                selected: selectedPlan == 1,
-                onTap: () => onSelect(1),
-                radioSelectedStyle:
-                    true, // как в макете: чёрная толстая обводка
-              ),
-              SizedBox(height: sp(4)),
-              _PlanTile(
-                scale: scale,
-                accent: const Color(0xFF77C97E),
-                label: 'Yearly',
-                price: r'$49.99 / year',
-                badgeText: 'Save 75%',
-                badgeBg: const Color(0xFF77C97E),
-                badgeFg: Colors.white,
-                selected: selectedPlan == 2,
-                onTap: () => onSelect(2),
-                radioSelectedStyle: false,
-              ),
-              SizedBox(height: sp(14)),
-              SlideToStart(
-                onComplete: () async {},
-                label: "Start".toUpperCase(),
-              ),
-              SizedBox(height: sp(8)),
-            ],
-          ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(sp(16), sp(16), sp(16), sp(16)),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _PlanTile(
+              scale: scale,
+              accent: const Color(0xFFCBA7FF),
+              label: 'Weekly',
+              price: r'$3.99 / week',
+              badgeText: '3-day trial',
+              badgeBg: const Color(0xFFCBA7FF).withOpacity(0.10),
+              badgeFg: const Color(0xFFCBA7FF),
+              selected: selectedPlan == 0,
+              onTap: () => onSelect(0),
+              radioSelectedStyle: false,
+            ),
+            SizedBox(height: sp(4)),
+            _PlanTile(
+              scale: scale,
+              accent: const Color(0xFF7ACBFF),
+              label: 'Monthly',
+              price: r'$11.99 / month',
+              badgeText: null,
+              badgeBg: Colors.transparent,
+              badgeFg: Colors.transparent,
+              selected: selectedPlan == 1,
+              onTap: () => onSelect(1),
+              radioSelectedStyle: true, // как в макете: чёрная толстая обводка
+            ),
+            SizedBox(height: sp(4)),
+            _PlanTile(
+              scale: scale,
+              accent: const Color(0xFF77C97E),
+              label: 'Yearly',
+              price: r'$49.99 / year',
+              badgeText: 'Save 75%',
+              badgeBg: const Color(0xFF77C97E),
+              badgeFg: Colors.white,
+              selected: selectedPlan == 2,
+              onTap: () => onSelect(2),
+              radioSelectedStyle: false,
+            ),
+            SizedBox(height: sp(14)),
+            SlideToStart(
+              onComplete: () async {},
+              enabled: true,
+              label: "Start".toUpperCase(),
+            ),
+            SizedBox(height: sp(8)),
+          ],
         ),
       ),
     );
@@ -383,15 +330,13 @@ class _PlanTile extends StatelessWidget {
               // left accent bar
               Positioned(
                 left: 0,
-                top: 0,
-                bottom: 0,
+                top: 16,
+                bottom: 16,
                 child: Container(
                   width: sp(4),
                   decoration: BoxDecoration(
                     color: accent,
-                    borderRadius: BorderRadius.horizontal(
-                      left: Radius.circular(sp(20)),
-                    ),
+                    borderRadius: BorderRadius.circular(sp(20)),
                   ),
                 ),
               ),
@@ -465,14 +410,12 @@ class _PlanTile extends StatelessWidget {
                       height: sp(24),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: radioSelectedStyle && selected
-                            ? Colors.white
-                            : Colors.transparent,
+                        color: selected ? Colors.white : Colors.transparent,
                         border: Border.all(
-                          color: (radioSelectedStyle && selected)
+                          color: (selected)
                               ? const Color(0xFF111111)
                               : const Color(0xFF111111).withOpacity(0.04),
-                          width: radioSelectedStyle && selected ? sp(8) : sp(3),
+                          width: selected ? sp(8) : sp(3),
                         ),
                       ),
                     ),
