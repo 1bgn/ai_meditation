@@ -11,7 +11,7 @@ import '../controllers/breathing_controller.dart';
 class BreathingDurationSelectionPage extends StatelessWidget {
   const BreathingDurationSelectionPage({super.key});
 
-  static const _durations = [1, 3, 5, 10];
+  static const _durations = [0, 1, 3, 5, 10];
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +79,8 @@ class BreathingDurationSelectionPage extends StatelessWidget {
                   bottom: 24,
                 ),
                 itemCount: _durations.length,
-                separatorBuilder: (context, index) => const SizedBox(height: 12),
+                separatorBuilder: (context, index) =>
+                    const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final duration = _durations[index];
                   final isSelected =
@@ -142,11 +143,7 @@ class _SelectionOptionTile extends StatelessWidget {
             ),
           ),
           if (isSelected)
-            const Icon(
-              Icons.check,
-              size: 18,
-              color: Colors.black,
-            ),
+            const Icon(Icons.check, size: 18, color: Colors.black),
         ],
       ),
     ),

@@ -388,6 +388,7 @@ void _showBottomSheet(BuildContext context, Widget child) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
+    useRootNavigator: true,
     backgroundColor: Colors.transparent,
     builder: (context) => ClipRRect(
       borderRadius: const BorderRadius.only(
