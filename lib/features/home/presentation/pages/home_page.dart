@@ -4,6 +4,9 @@ import 'package:ai_meditation/core/ui/glass_concave_tab_bar.dart';
 import 'package:ai_meditation/core/ui/tab_bar.dart';
 import 'package:ai_meditation/features/daily_routine/domain/entities/daily_routine_activity.dart';
 import 'package:ai_meditation/features/daily_routine/presentation/pages/start_routine_page.dart';
+import 'package:ai_meditation/features/home/presentation/widgets/action_botton.dart';
+import 'package:ai_meditation/features/home/presentation/widgets/home_meditation_card.dart';
+import 'package:ai_meditation/features/home/presentation/widgets/recomendtation_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -183,16 +186,17 @@ class _HomePageState extends State<HomePage> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: _ActionButton(
+                                              child: ActionButton(
                                                 title: 'Generate Meditation'
                                                     .toUpperCase(),
                                                 position:
-                                                    _ActionButtonPosition.top,
+                                                    ActionButtonPosition.top,
                                                 iconAsset:
                                                     'assets/images/generate_mediation.svg',
                                                 onPressed: () =>
-                                                    _showGenerationSheet(
+                                                    _showBottomSheet(
                                                       context,
+                                                      const GenerationPage(),
                                                     ),
                                               ),
                                             ),
@@ -202,16 +206,17 @@ class _HomePageState extends State<HomePage> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: _ActionButton(
+                                              child: ActionButton(
                                                 title: 'Breathing Exercise'
                                                     .toUpperCase(),
-                                                position: _ActionButtonPosition
-                                                    .middle,
+                                                position:
+                                                    ActionButtonPosition.middle,
                                                 iconAsset:
                                                     'assets/images/breathing_exercise.svg',
                                                 onPressed: () =>
-                                                    _showBreathingSheet(
+                                                    _showBottomSheet(
                                                       context,
+                                                      const BreathingPage(),
                                                     ),
                                               ),
                                             ),
@@ -221,15 +226,18 @@ class _HomePageState extends State<HomePage> {
                                         Row(
                                           children: [
                                             Expanded(
-                                              child: _ActionButton(
+                                              child: ActionButton(
                                                 title: 'Daily Routine'
                                                     .toUpperCase(),
-                                                position: _ActionButtonPosition
-                                                    .bottom,
+                                                position:
+                                                    ActionButtonPosition.bottom,
                                                 iconAsset:
                                                     'assets/images/daily_routine.svg',
                                                 onPressed: () =>
-                                                    _showRoutineSheet(context),
+                                                    _showBottomSheet(
+                                                      context,
+                                                      const StartRoutinePage(),
+                                                    ),
                                               ),
                                             ),
                                           ],
@@ -280,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: Column(
                                       children: [
-                                        _MeditationCard(
+                                        HomeMeditationCard(
                                           item: DailyRoutineMeditation(
                                             title: "Calm",
                                             backgroundSound: "Ambient Music",
@@ -346,9 +354,9 @@ class _HomePageState extends State<HomePage> {
                                                 children: [
                                                   SizedBox(width: 16),
 
-                                                  _RecomentationItem(number: 1),
-                                                  _RecomentationItem(number: 2),
-                                                  _RecomentationItem(number: 3),
+                                                  RecomentationItem(number: 1),
+                                                  RecomentationItem(number: 2),
+                                                  RecomentationItem(number: 3),
                                                 ],
                                               ),
                                             ),
@@ -376,209 +384,7 @@ class _HomePageState extends State<HomePage> {
   void onSelectRecomendation(int index) {}
 }
 
-enum _ActionButtonPosition { top, middle, bottom }
-
-class _ActionButton extends StatelessWidget {
-  const _ActionButton({
-    required this.title,
-    required this.position,
-    required this.onPressed,
-    required this.iconAsset,
-  });
-
-  final String title;
-  final _ActionButtonPosition position;
-  final VoidCallback onPressed;
-  final String iconAsset;
-
-  @override
-  Widget build(BuildContext context) {
-    final borderRadius = switch (position) {
-      _ActionButtonPosition.top => BorderRadius.only(
-        topLeft: const Radius.circular(32),
-        topRight: const Radius.circular(32),
-        bottomLeft: const Radius.circular(12),
-        bottomRight: const Radius.circular(12),
-      ),
-      _ActionButtonPosition.middle => BorderRadius.circular(12),
-      _ActionButtonPosition.bottom => BorderRadius.only(
-        bottomLeft: const Radius.circular(32),
-        bottomRight: const Radius.circular(32),
-        topLeft: const Radius.circular(12),
-        topRight: const Radius.circular(12),
-      ),
-    };
-
-    return FilledButton(
-      onPressed: onPressed,
-      style: FilledButton.styleFrom(
-        shape: RoundedRectangleBorder(borderRadius: borderRadius),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 26),
-      ),
-      child: Row(
-        children: [
-          SvgPicture.asset(iconAsset, width: 24, height: 24),
-          const SizedBox(width: 36.5),
-          Expanded(child: Text(title)),
-        ],
-      ),
-    );
-  }
-}
-
-class _MeditationCard extends StatelessWidget {
-  const _MeditationCard({required this.item, required this.imageAsset});
-
-  final DailyRoutineMeditation item;
-  final String imageAsset;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      imageAsset,
-                      width: 88,
-                      height: 88,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        height: 36,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withOpacity(0.5),
-                              Colors.black.withOpacity(0.0),
-                            ],
-                            stops: [0.0, 1.0],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          child: BackdropFilter(
-                            filter: ui.ImageFilter.blur(
-                              sigmaX: 1.0,
-                              sigmaY: 1.0,
-                            ),
-                            child: Container(),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          '${item.durationMinutes} MIN'.toUpperCase(),
-                          style: GoogleFonts.funnelDisplay(
-                            fontSize: 14,
-                            height: 20 / 14,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '${item.durationMinutes} minutes'.toUpperCase(),
-                          style: GoogleFonts.funnelDisplay(
-                            fontSize: 16,
-                            height: 24 / 16,
-                            letterSpacing: -0.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      item.description,
-                      style: GoogleFonts.funnelDisplay(
-                        fontSize: 14,
-                        height: 20 / 14,
-                        color: const Color(0xffAAAEBA),
-                        letterSpacing: -0.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: EdgeInsets.only(
-                        left: 8,
-                        right: 8,
-                        top: 3,
-                        bottom: 3,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Color.fromRGBO(119, 201, 126, 0.08),
-                        borderRadius: BorderRadius.all(Radius.circular(100)),
-                      ),
-                      child: Wrap(
-                        direction: Axis.horizontal,
-                        children: [
-                          SvgPicture.asset("assets/images/mat.svg"),
-                          SizedBox(width: 6),
-                          Text(
-                            "Daily Routine".toUpperCase(),
-                            style: GoogleFonts.funnelDisplay(
-                              fontSize: 14,
-                              height: 20 / 14,
-                              color: Color.fromRGBO(119, 201, 126, 1),
-                              letterSpacing: -0.5,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-void _showGenerationSheet(BuildContext context) {
+void _showBottomSheet(BuildContext context, Widget child) {
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -590,191 +396,8 @@ void _showGenerationSheet(BuildContext context) {
       ),
       child: SizedBox(
         height: MediaQuery.of(context).size.height * 0.9,
-        child: const GenerationPage(),
+        child: child,
       ),
     ),
   );
-}
-
-void _showBreathingSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.90,
-        child: const BreathingPage(),
-      ),
-    ),
-  );
-}
-
-void _showRoutineSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.9,
-        child: const StartRoutinePage(),
-      ),
-    ),
-  );
-}
-
-class _RecomentationItem extends StatelessWidget {
-  final int number;
-
-  const _RecomentationItem({super.key, required this.number});
-
-  String get breathImg {
-    switch (number) {
-      case 1:
-        return 'assets/images/breath1.jpg';
-      case 2:
-        return 'assets/images/breath2.jpg';
-      case 3:
-        return 'assets/images/breath3.jpg';
-      default:
-        return 'assets/images/breath1.jpg';
-    }
-  }
-
-  int get breathTime {
-    switch (number) {
-      case 1:
-        return 3;
-      case 2:
-        return 5;
-      case 3:
-        return 10;
-      default:
-        return 3;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 157,
-      margin: EdgeInsets.only(right: 8),
-      padding: EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(24),
-        color: Colors.white,
-      ),
-      child: Stack(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.asset(
-              breathImg,
-              width: 149,
-              height: 243,
-              fit: BoxFit.cover,
-            ),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.topCenter,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 3),
-                margin: EdgeInsets.only(top: 8, left: 8, right: 8),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: Color(0xff11111129).withOpacity(0.16),
-                ),
-                child: Row(
-                  children: [
-                    SizedBox(width: 22),
-                    SvgPicture.asset("assets/images/breathing_icon.svg"),
-                    SizedBox(width: 6),
-                    Text(
-                      "BREATHING",
-                      style: GoogleFonts.funnelDisplay(
-                        color: Colors.white,
-                        fontSize: 12,
-                        height: 15 / 12,
-                        letterSpacing: -0.5,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                height: 68,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.black.withOpacity(0.5),
-                      Colors.black.withOpacity(0.0),
-                    ],
-                    stops: [0.0, 1.0],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                  ),
-                ),
-                child: ClipRRect(
-                  child: BackdropFilter(
-                    filter: ui.ImageFilter.blur(sigmaX: 1.0, sigmaY: 1.0),
-                    child: Container(),
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.bottomLeft,
-              child: Container(
-                margin: EdgeInsets.only(bottom: 12, left: 16),
-                child: Wrap(
-                  direction: Axis.vertical,
-                  children: [
-                    Text(
-                      "$breathTime MIN",
-                      style: GoogleFonts.funnelDisplay(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        height: 20 / 12,
-                        letterSpacing: -0.5,
-                        color: Colors.white.withOpacity(0.64),
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      "SLEEP",
-                      style: GoogleFonts.funnelDisplay(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12,
-                        height: 20 / 12,
-                        letterSpacing: -0.5,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

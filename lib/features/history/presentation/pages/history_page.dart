@@ -28,17 +28,7 @@ class _HistoryPageState extends State<HistoryPage> {
     'assets/images/evening_meditation.png',
   ];
 
-  // Временно: локальные breathing-элементы (позже заменишь на controller/repo)
-  final _breathingItems = <_BreathingHistoryUiItem>[
-    // Если хочешь пусто — просто сделай список [].
-    // _BreathingHistoryUiItem(
-    //   title: 'Breathing',
-    //   durationMinutes: 5,
-    //   inhaleSeconds: 4,
-    //   exhaleSeconds: 6,
-    //   moodLabel: 'Calm',
-    // ),
-  ];
+  final _breathingItems = <_BreathingHistoryUiItem>[];
 
   @override
   void initState() {
@@ -52,91 +42,39 @@ class _HistoryPageState extends State<HistoryPage> {
       backgroundColor: const Color(0xffF6F7FA),
       body: SafeArea(
         bottom: false,
-        child: Column(
+        child: Stack(
           children: [
-            const SizedBox(height: 16),
-            _HistoryHeader(
-              title: 'History',
-              onClose: () => Navigator.of(context).maybePop(),
-              onLike: () {},
-              onRepeat: () {},
-            ),
-            const SizedBox(height: 16),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: MyTabBar(
-                selectedIndex: _tabIndex,
-                tabs: [
-                  TabItem(title: 'Meditations'),
-                  TabItem(title: 'Breathing'),
-                ],
-                onTap: (i) => setState(() => _tabIndex = i),
+            Positioned.fill(
+              child: Image.asset(
+                "assets/images/home_bg.png",
+                fit: BoxFit.cover,
               ),
             ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: IndexedStack(
-                index: _tabIndex,
-                children: [
-                  // Meditations
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Watch((context) {
-                      final items = _meditationsController.items.value;
 
-                      if (items.isEmpty) {
-                        return const Center(child: Text('No meditations yet.'));
-                      }
+            Column(
+              children: [
+                const SizedBox(height: 16),
+                _HistoryHeader(
+                  title: 'History',
+                  onClose: () => Navigator.of(context).maybePop(),
+                  onLike: () {},
+                  onRepeat: () {},
+                ),
+                const SizedBox(height: 16),
 
-                      return ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.only(bottom: 24),
-                        itemCount: items.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 18),
-                        itemBuilder: (context, index) {
-                          final item = items[index];
-                          final image =
-                              _meditationImages[index %
-                                  _meditationImages.length];
-
-                          return _MeditationCard(item: item, imageAsset: image);
-                        },
-                      );
-                    }),
-                  ),
-
-                  // Breathing
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: Builder(
-                      builder: (context) {
-                        if (_breathingItems.isEmpty) {
-                          return const Center(
-                            child: Text('No breathing history yet.'),
-                          );
-                        }
-
-                        return ListView.separated(
-                          physics: const BouncingScrollPhysics(),
-                          padding: const EdgeInsets.only(bottom: 24),
-                          itemCount: _breathingItems.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 18),
-                          itemBuilder: (context, index) {
-                            final item = _breathingItems[index];
-                            return _BreathingCard(
-                              item: item,
-                              imageAsset: 'assets/images/daily_routine.svg',
-                              color: const Color.fromRGBO(119, 201, 126, 0.16),
-                              durationLabel: '${item.durationMinutes} min',
-                            );
-                          },
-                        );
-                      },
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: _HistoryGlassBody(
+                      tabIndex: _tabIndex,
+                      onTabChanged: (i) => setState(() => _tabIndex = i),
+                      meditationsController: _meditationsController,
+                      meditationImages: _meditationImages,
+                      breathingItems: _breathingItems,
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -145,11 +83,172 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
+class _HistoryGlassBody extends StatelessWidget {
+  const _HistoryGlassBody({
+    required this.tabIndex,
+    required this.onTabChanged,
+    required this.meditationsController,
+    required this.meditationImages,
+    required this.breathingItems,
+  });
+
+  final int tabIndex;
+  final ValueChanged<int> onTabChanged;
+
+  final HistoryController meditationsController;
+  final List<String> meditationImages;
+  final List<_BreathingHistoryUiItem> breathingItems;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 0),
+      padding: const EdgeInsets.only(top: 16),
+      decoration: BoxDecoration(
+        color: const Color.fromRGBO(255, 255, 255, 0.48),
+        borderRadius: BorderRadius.circular(40),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(40),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(40),
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(255, 255, 255, 0),
+                Color.fromRGBO(255, 255, 255, 1),
+              ],
+            ),
+          ),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.all(2),
+                  child: Image.asset(
+                    "assets/images/home_bg.png",
+                    fit: BoxFit.cover,
+                    opacity: const AlwaysStoppedAnimation(.68),
+                  ),
+                ),
+              ),
+
+              Positioned.fill(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: MyTabBarFill(
+                              selectedIndex: tabIndex,
+                              tabs: [
+                                TabItem(title: 'Meditations'),
+                                TabItem(title: 'Breathing'),
+                              ],
+                              onTap: onTabChanged,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      Expanded(
+                        child: IndexedStack(
+                          index: tabIndex,
+                          children: [
+                            // Meditations
+                            Watch((context) {
+                              final items = meditationsController.items.value;
+
+                              if (items.isEmpty) {
+                                return const Center(
+                                  child: Text('No meditations yet.'),
+                                );
+                              }
+
+                              return ListView.separated(
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 24),
+                                itemCount: items.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 18),
+                                itemBuilder: (context, index) {
+                                  final item = items[index];
+                                  final image =
+                                      meditationImages[index %
+                                          meditationImages.length];
+
+                                  return _MeditationCard(
+                                    item: item,
+                                    imageAsset: image,
+                                  );
+                                },
+                              );
+                            }),
+
+                            // Breathing
+                            Builder(
+                              builder: (context) {
+                                if (breathingItems.isEmpty) {
+                                  return const Center(
+                                    child: Text('No breathing history yet.'),
+                                  );
+                                }
+
+                                return ListView.separated(
+                                  physics: const BouncingScrollPhysics(),
+                                  padding: const EdgeInsets.only(bottom: 24),
+                                  itemCount: breathingItems.length,
+                                  separatorBuilder: (_, __) =>
+                                      const SizedBox(height: 18),
+                                  itemBuilder: (context, index) {
+                                    final item = breathingItems[index];
+                                    return _BreathingCard(
+                                      item: item,
+                                      imageAsset:
+                                          'assets/images/daily_routine.svg',
+                                      color: const Color.fromRGBO(
+                                        119,
+                                        201,
+                                        126,
+                                        0.16,
+                                      ),
+                                      durationLabel:
+                                          '${item.durationMinutes} min',
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _MeditationCard extends StatelessWidget {
-  const _MeditationCard({required this.item, required this.imageAsset});
+  const _MeditationCard({
+    required this.item,
+    required this.imageAsset,
+    this.onDelete,
+  });
 
   final MeditationHistoryItem item;
   final String imageAsset;
+  final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -160,103 +259,166 @@ class _MeditationCard extends StatelessWidget {
 
     return Column(
       children: [
-        _DailyRoutineHeader(title: item.title),
-        const SizedBox(height: 12),
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
           ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Stack(
             children: [
-              Stack(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(16),
-                    child: Image.asset(
-                      imageAsset,
-                      width: 88,
-                      height: 88,
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Container(
-                        height: 36,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          gradient: LinearGradient(
-                            colors: [
-                              Colors.black.withOpacity(0.5),
-                              Colors.black.withOpacity(0.0),
-                            ],
-                            stops: const [0.0, 1.0],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter,
-                          ),
-                        ),
-                        child: ClipRRect(
-                          child: BackdropFilter(
-                            filter: ui.ImageFilter.blur(
-                              sigmaX: 1.0,
-                              sigmaY: 1.0,
-                            ),
-                            child: Container(),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned.fill(
-                    child: Align(
-                      alignment: Alignment.bottomCenter,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: Text(
-                          '${item.durationMinutes} MIN'.toUpperCase(),
-                          style: GoogleFonts.funnelDisplay(
-                            fontSize: 14,
-                            height: 20 / 14,
-                            color: Colors.white,
-                            letterSpacing: -0.5,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              // Чтобы контент не залезал под иконку справа сверху
+              Padding(
+                padding: const EdgeInsets.only(right: 28),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      '${item.durationMinutes} minutes'.toUpperCase(),
-                      style: GoogleFonts.funnelDisplay(
-                        fontSize: 16,
-                        height: 24 / 16,
-                        letterSpacing: -0.5,
-                        fontWeight: FontWeight.w700,
-                      ),
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.asset(
+                            imageAsset,
+                            width: 88,
+                            height: 88,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Container(
+                              height: 36,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.black.withOpacity(0.5),
+                                    Colors.black.withOpacity(0.0),
+                                  ],
+                                  stops: const [0.0, 1.0],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                ),
+                              ),
+                              child: ClipRRect(
+                                child: BackdropFilter(
+                                  filter: ui.ImageFilter.blur(
+                                    sigmaX: 1.0,
+                                    sigmaY: 1.0,
+                                  ),
+                                  child: Container(),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: Align(
+                            alignment: Alignment.bottomCenter,
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Text(
+                                '${item.durationMinutes} MIN'.toUpperCase(),
+                                style: GoogleFonts.funnelDisplay(
+                                  fontSize: 14,
+                                  height: 20 / 14,
+                                  color: Colors.white,
+                                  letterSpacing: -0.5,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Completed on $dateText'.toUpperCase(),
-                      style: GoogleFonts.funnelDisplay(
-                        fontSize: 14,
-                        height: 20 / 14,
-                        color: const Color(0xffAAAEBA),
-                        letterSpacing: -0.5,
-                        fontWeight: FontWeight.w700,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${item.durationMinutes} minutes'.toUpperCase(),
+                            style: GoogleFonts.funnelDisplay(
+                              fontSize: 16,
+                              height: 24 / 16,
+                              letterSpacing: -0.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Take a quick meditation break',
+                            style: GoogleFonts.funnelDisplay(
+                              fontSize: 14,
+                              height: 20 / 14,
+                              color: const Color(0xffAAAEBA),
+                              letterSpacing: -0.5,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            padding: const EdgeInsets.only(
+                              left: 8,
+                              right: 8,
+                              top: 3,
+                              bottom: 3,
+                            ),
+                            decoration: const BoxDecoration(
+                              color: Color.fromRGBO(119, 201, 126, 0.08),
+                              borderRadius: BorderRadius.all(
+                                Radius.circular(100),
+                              ),
+                            ),
+                            child: Wrap(
+                              direction: Axis.horizontal,
+                              children: [
+                                SvgPicture.asset("assets/images/mat.svg"),
+                                const SizedBox(width: 6),
+                                Text(
+                                  "Daily Routine".toUpperCase(),
+                                  style: GoogleFonts.funnelDisplay(
+                                    fontSize: 14,
+                                    height: 20 / 14,
+                                    color: const Color.fromRGBO(
+                                      119,
+                                      201,
+                                      126,
+                                      1,
+                                    ),
+                                    letterSpacing: -0.5,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              Positioned(
+                top: 0,
+                right: 0,
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(12),
+                    onTap: onDelete,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: SvgPicture.asset(
+                        'assets/images/delete.svg',
+                        width: 32,
+                        height: 32,
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -310,8 +472,6 @@ class _BreathingCard extends StatelessWidget {
 
     return Column(
       children: [
-        _DailyRoutineHeader(title: item.title),
-        const SizedBox(height: 12),
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -458,32 +618,4 @@ class _HistoryHeader extends StatelessWidget {
       ],
     ),
   );
-}
-
-class _DailyRoutineHeader extends StatelessWidget {
-  const _DailyRoutineHeader({required this.title});
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(100),
-      ),
-      child: Center(
-        child: Text(
-          title,
-          style: GoogleFonts.funnelDisplay(
-            fontSize: 16,
-            height: 24 / 16,
-            letterSpacing: -0.5,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-    );
-  }
 }

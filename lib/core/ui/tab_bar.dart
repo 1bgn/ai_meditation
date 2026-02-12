@@ -87,3 +87,85 @@ class _MyTab extends StatelessWidget {
     return GestureDetector(onTap: () => onTap(index), child: child);
   }
 }
+
+class MyTabBarFill extends StatelessWidget {
+  final ValueChanged<int> onTap;
+  final List<TabItem> tabs;
+  final int selectedIndex;
+
+  const MyTabBarFill({
+    super.key,
+    required this.tabs,
+    required this.onTap,
+    required this.selectedIndex,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(100)),
+          color: Colors.white,
+        ),
+        padding: const EdgeInsets.all(4),
+        child: Row(
+          children: tabs.asMap().entries.map((entry) {
+            final i = entry.key;
+            final tab = entry.value;
+
+            return Expanded(
+              child: _MyTab(
+                title: tab.title,
+                index: i,
+                isSelected: selectedIndex == i,
+                onTap: onTap,
+              ),
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
+
+class MyTabBarWrap extends StatelessWidget {
+  final ValueChanged<int> onTap;
+  final List<TabItem> tabs;
+  final int selectedIndex;
+
+  const MyTabBarWrap({
+    super.key,
+    required this.tabs,
+    required this.onTap,
+    required this.selectedIndex,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(100)),
+        color: Colors.white,
+      ),
+      padding: const EdgeInsets.all(4),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: tabs.asMap().entries.map((entry) {
+            final i = entry.key;
+            final tab = entry.value;
+
+            return _MyTab(
+              title: tab.title,
+              index: i,
+              isSelected: selectedIndex == i,
+              onTap: onTap,
+            );
+          }).toList(),
+        ),
+      ),
+    );
+  }
+}
