@@ -125,8 +125,10 @@ class MeditationPlayerController {
       _ => -1,
     };
     if (idx < 0) return;
-
     await _backgroundSoundPlayer.seek(Duration.zero, index: idx);
+
+    print("VDSVSDVSD ${_backgroundSoundPlayer.processingState }");
+   // await _backgroundSoundPlayer.clearAudioSources();
     _backgroundSoundPlayer.play();
   }
 

@@ -101,7 +101,11 @@ flutter:
     - assets/images/
     - assets/fonts/
     - assets/sounds/
-
+    - assets/tokenizer_vocab.json
+    - assets/us_gold.json
+    - assets/us_silver.json
+    - assets/gb_gold.json
+    - assets/gb_silver.json
 
 
   # To add assets to your application, add an assets section, like this:
