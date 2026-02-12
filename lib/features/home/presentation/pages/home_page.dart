@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:ai_meditation/core/ui/bottom_sheet_util.dart';
 import 'package:ai_meditation/core/ui/glass_concave_tab_bar.dart';
 import 'package:ai_meditation/core/ui/tab_bar.dart';
 import 'package:ai_meditation/features/daily_routine/domain/entities/daily_routine_activity.dart';
@@ -385,20 +386,9 @@ class _HomePageState extends State<HomePage> {
 }
 
 void _showBottomSheet(BuildContext context, Widget child) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-    useRootNavigator: true,
-    backgroundColor: Colors.transparent,
-    builder: (context) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.9,
-        child: child,
-      ),
-    ),
+  showMyBootomSheet(
+    context,
+    height: MediaQuery.of(context).size.height * 0.9,
+    child: child,
   );
 }

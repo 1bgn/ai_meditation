@@ -1,5 +1,7 @@
+import 'package:ai_meditation/core/ui/bottom_sheet_util.dart';
 import 'package:ai_meditation/core/ui/slide_to_start.dart';
 import 'package:ai_meditation/core/ui/concave_circle_button.dart';
+import 'package:ai_meditation/features/generation/presentation/pages/meditation_player_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -15,11 +17,25 @@ import '../controllers/generation_controller.dart';
 import 'background_sound_selection_page.dart';
 import 'duration_selection_page.dart';
 import 'goal_selection_page.dart';
-import 'meditation_player_page.dart';
 import 'voice_style_selection_page.dart';
 
 class GenerationPage extends StatefulWidget {
-  const GenerationPage({super.key});
+  const GenerationPage({
+    super.key,
+    this.presets,
+    this.applyPresetsOverStored = true,
+    this.savePresetsOnOpen = false,
+  });
+
+  /// Предустановки: можно передать только часть полей (остальные оставить null).
+  final GenerationOptions? presets;
+
+  /// true: stored -> накладываем presets (presets побеждают).
+  /// false: presets -> накладываем stored (stored побеждают).
+  final bool applyPresetsOverStored;
+
+  /// Если нужно, чтобы предустановки сразу сохранялись в storage.
+  final bool savePresetsOnOpen;
 
   @override
   State<GenerationPage> createState() => _GenerationPageState();
@@ -32,7 +48,17 @@ class _GenerationPageState extends State<GenerationPage> {
   @override
   void initState() {
     super.initState();
-    _controller = getIt<GenerationController>()..load();
+    _controller = getIt<GenerationController>();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _controller.load(presets: widget.presets);
+    });
+  }
+
+  @override
+  void dispose() {
+    getIt.resetLazySingleton(instance: _controller);
+    super.dispose();
   }
 
   Future<void> _generateAndOpenPlayer(BuildContext context) async {
@@ -40,13 +66,21 @@ class _GenerationPageState extends State<GenerationPage> {
     if (!context.mounted || script == null) {
       return;
     }
-    final didConfirmStart = await _showGeneratedMeditationSheet(
+
+    final didConfirmStart = await showMyBootomSheet(
       context,
-      durationMinutes: _controller.options.value.durationMinutes!,
+
+      height: MediaQuery.of(context).size.height * 0.88,
+      child: _GeneratedMeditationSheet(
+        durationMinutes: _controller.options.value.durationMinutes!,
+        onClose: () => Navigator.of(context).pop(false),
+        onStart: () => Navigator.of(context).pop(true),
+      ),
     );
     if (!context.mounted || didConfirmStart != true) {
       return;
     }
+
     _isPreparingAudio.value = true;
     try {
       final source = await getIt<TtsService>().buildAudioSource(
@@ -97,31 +131,6 @@ class _GenerationPageState extends State<GenerationPage> {
         ),
       );
 
-  Future<bool?> _showGeneratedMeditationSheet(
-    BuildContext context, {
-    required int durationMinutes,
-  }) => showModalBottomSheet<bool>(
-    context: context,
-    isScrollControlled: true,
-    isDismissible: true,
-    enableDrag: true,
-    backgroundColor: Colors.transparent,
-    builder: (sheetContext) => ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(32),
-        topRight: Radius.circular(32),
-      ),
-      child: SizedBox(
-        height: MediaQuery.of(context).size.height * 0.88,
-        child: _GeneratedMeditationSheet(
-          durationMinutes: durationMinutes,
-          onClose: () => Navigator.of(sheetContext).pop(false),
-          onStart: () => Navigator.of(sheetContext).pop(true),
-        ),
-      ),
-    ),
-  );
-
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Stack(
@@ -129,7 +138,7 @@ class _GenerationPageState extends State<GenerationPage> {
         Positioned.fill(
           child: ClipRRect(
             child: Transform.translate(
-              offset: Offset(0, -40),
+              offset: const Offset(0, -40),
               child: Image.asset(
                 'assets/images/meditation_bg.png',
                 fit: BoxFit.cover,
@@ -146,7 +155,10 @@ class _GenerationPageState extends State<GenerationPage> {
                 gradient: LinearGradient(
                   begin: AlignmentGeometry.topCenter,
                   end: AlignmentGeometry.bottomCenter,
-                  colors: [Color(0xffF3F4F8), Color(0xffF3F4F8).withAlpha(0)],
+                  colors: [
+                    const Color(0xffF3F4F8),
+                    const Color(0xffF3F4F8).withAlpha(0),
+                  ],
                 ),
               ),
             ),
@@ -156,7 +168,7 @@ class _GenerationPageState extends State<GenerationPage> {
           child: Column(
             children: [
               Container(
-                decoration: BoxDecoration(),
+                decoration: const BoxDecoration(),
                 height: 58,
                 child: Stack(
                   children: [
@@ -170,7 +182,6 @@ class _GenerationPageState extends State<GenerationPage> {
                         svgAssetPath: "assets/images/close.svg",
                       ),
                     ),
-
                     Positioned(
                       child: Align(
                         alignment: Alignment.topCenter,

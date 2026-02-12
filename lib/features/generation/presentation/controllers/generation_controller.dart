@@ -30,12 +30,39 @@ class GenerationController {
       backgroundSound: null,
     ),
   );
+
   final isGenerating = signal(false);
   final error = signal<String?>(null);
   final lastScript = signal<String?>(null);
 
-  void load() {
-    options.value =  options.value;
+  GenerationOptions _mergeOptions(
+    GenerationOptions base,
+    GenerationOptions patch,
+  ) {
+    return base.copyWith(
+      goal: patch.goal ?? base.goal,
+      durationMinutes: patch.durationMinutes ?? base.durationMinutes,
+      voiceStyle: patch.voiceStyle ?? base.voiceStyle,
+      backgroundSound: patch.backgroundSound ?? base.backgroundSound,
+    );
+  }
+
+  /// Загружает сохранённые опции.
+  /// Если передали [presets] — применяет их поверх сохранённых (только non-null поля).
+  /// Presets НЕ сохраняются.
+  Future<void> load({GenerationOptions? presets}) async {
+    error.value = null;
+
+    try {
+      // Универсально: поддержит и GenerationOptions, и GenerationOptions?
+      final GenerationOptions? stored =
+          await _getOptions.call() as GenerationOptions?;
+
+      final base = options.value;
+      options.value = presets == null ? base : _mergeOptions(base, presets);
+    } catch (e) {
+      error.value = e.toString();
+    }
   }
 
   Future<void> updateGoal(String goal) =>
@@ -51,20 +78,34 @@ class GenerationController {
       _update(options.value.copyWith(backgroundSound: sound));
 
   Future<String?> generate() async {
+    final current = options.value;
+
+    if (current.goal == null ||
+        current.durationMinutes == null ||
+        current.voiceStyle == null ||
+        current.backgroundSound == null) {
+      error.value =
+          'Please select goal, duration, voice style and background sound.';
+      return null;
+    }
+
     isGenerating.value = true;
     error.value = null;
+
     try {
-      await _saveOptions(options.value);
-      final script = await _generateMeditation(options.value);
+      // ВАЖНО: тут НЕ сохраняем options, чтобы одноразовые presets не затирали storage.
+      final script = await _generateMeditation.call(current);
       lastScript.value = script;
+
       final historyItem = MeditationHistoryItem(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
-        title: '${options.value.goal} Meditation',
-        durationMinutes: options.value.durationMinutes!,
+        title: '${current.goal} Meditation',
+        durationMinutes: current.durationMinutes!,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      await _addHistoryItem(historyItem);
+      await _addHistoryItem.call(historyItem);
+
       return script;
     } catch (e) {
       error.value = e.toString();
@@ -76,6 +117,10 @@ class GenerationController {
 
   Future<void> _update(GenerationOptions next) async {
     options.value = next;
-    await _saveOptions(next);
+    try {
+      await _saveOptions.call(next); // сохраняем только явные изменения юзера
+    } catch (e) {
+      error.value = e.toString();
+    }
   }
 }
