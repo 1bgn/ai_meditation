@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'dart:ui' as ui;
 
+import 'package:ai_meditation/core/tts/build_tts.dart';
 import 'package:ai_meditation/core/ui/liquid_glass_circle_icon_buttons.dart';
 import 'package:ai_meditation/features/generation/presentation/pages/background_and_volume_selector_page.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,7 @@ class MeditationPlayerArgs {
     required this.durationMinutes,
     required this.voiceStyle,
     required this.backgroundSound,
-    required this.durationTrack,
+    required this.buildTTs,
     this.preloadedSource,
   });
 
@@ -32,7 +33,7 @@ class MeditationPlayerArgs {
   final String voiceStyle;
   final String backgroundSound;
   final AudioSource? preloadedSource;
-  final Duration durationTrack;
+  final BuiltTts buildTTs;
 }
 
 class MeditationPlayerPage extends StatefulWidget {
@@ -77,7 +78,7 @@ class _MeditationPlayerPageState extends State<MeditationPlayerPage> {
     _controller = getIt<MeditationPlayerController>();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _controller.start(
-        durationTrack: widget.args.durationTrack,
+        buildTts: widget.args.buildTTs,
         script: widget.args.script,
         voiceStyle: widget.args.voiceStyle,
         preloadedSource: widget.args.preloadedSource,

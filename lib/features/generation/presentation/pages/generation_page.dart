@@ -67,8 +67,8 @@ class _GenerationPageState extends State<GenerationPage> {
           durationMinutes: _controller.options.value.durationMinutes!,
           voiceStyle: _controller.options.value.voiceStyle!,
           backgroundSound: _controller.options.value.backgroundSound!,
-          preloadedSource: source.$1,
-          durationTrack: source.$2,
+          preloadedSource: source.source,
+          buildTTs: source,
         ),
       );
     } catch (e) {

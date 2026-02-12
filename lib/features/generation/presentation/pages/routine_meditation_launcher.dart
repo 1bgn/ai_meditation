@@ -42,7 +42,8 @@ class RoutineMeditationLauncher extends StatelessWidget {
       final playerArgs = MeditationPlayerArgs(
         title: args.title,
         script: script,
-        durationTrack: Duration(),
+        buildTTs: script as dynamic,
+        // buildTTs: args.,
         durationMinutes: args.durationMinutes,
         voiceStyle: args.voiceStyle,
         backgroundSound: args.backgroundSound,

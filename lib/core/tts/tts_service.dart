@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:ai_meditation/core/tts/build_tts.dart';
 import 'package:audio_session/audio_session.dart';
 import 'package:injectable/injectable.dart';
 import 'package:just_audio/just_audio.dart';
@@ -23,7 +24,7 @@ class TtsService {
   // Чтобы можно было подчистить временные wav/mp3 после проигрывания/экрана.
   final List<File> _tempFiles = [];
 
-  Future<(AudioSource, Duration)> buildAudioSource(
+  Future<BuiltTts> buildAudioSource(
     String text, {
     required String language,
     required double
@@ -66,6 +67,7 @@ class TtsService {
     );
 
     final sources = <AudioSource>[];
+    final chunkDurations = <Duration>[];
     var total = Duration.zero;
 
     for (var i = 0; i < chunks.length; i++) {
@@ -87,6 +89,7 @@ class TtsService {
         pcmSamples: pcm.length,
         sampleRate: result.sampleRate,
       );
+      chunkDurations.add(d);
       total += d;
 
       final file = await _writeWavFileFromPcm(
@@ -105,7 +108,11 @@ class TtsService {
       children: sources,
     );
 
-    return (playlist, total);
+    return BuiltTts(
+      source: playlist,
+      total: total,
+      chunkDurations: chunkDurations,
+    );
   }
 
   /// Вызывай, например, в dispose() экрана/сервиса, чтобы не забивать temp.

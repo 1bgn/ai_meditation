@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:typed_data';
 
-import 'package:flutter/services.dart';
+import 'package:ai_meditation/core/tts/build_tts.dart';
 import 'package:injectable/injectable.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:signals/signals.dart';
@@ -13,52 +12,62 @@ class MeditationPlayerController {
   MeditationPlayerController(this._ttsService);
 
   final TtsService _ttsService;
+
   final AudioPlayer _player = AudioPlayer();
   final AudioPlayer _backgroundSoundPlayer = AudioPlayer();
 
-  final isPlaying = signal(true);
+  final isPlaying = signal(false);
   final error = signal<String?>(null);
+
+  /// Глобальная позиция (по всей дорожке TTS).
   final position = signal(Duration.zero);
+
+  /// Длительность текущего чанка (можно оставить для дебага/вторичных нужд).
   final duration = signal(Duration.zero);
+
+  /// Глобальная длительность (по всем чанкам).
   final trackDuration = signal(Duration.zero);
+
   final backgroundSound = signal("None");
+
   StreamSubscription<Duration>? _positionSub;
   StreamSubscription<Duration?>? _durationSub;
   StreamSubscription<bool>? _playingSub;
 
+  // Для глобального позиционирования.
+  List<Duration> _chunkDurations = const [];
+  List<Duration> _prefix =
+      const []; // prefix[i] = сумма длительностей чанков [0..i-1]
+
   Future<void> start({
     required String script,
     required String voiceStyle,
-    required Duration durationTrack,
+    required BuiltTts buildTts,
     AudioSource? preloadedSource,
     String? backgroundSound,
   }) async {
-    print("init background sound $backgroundSound");
     error.value = null;
-    trackDuration.value = durationTrack;
+
+    // Важно: even если source уже готов, durations нужны для глобального seek/позиции.
+    _setChunkDurations(buildTts.chunkDurations);
+    trackDuration.value = buildTts.total;
+
     try {
       _bindPlayerStreams();
-      final source =
-          preloadedSource ??
-          (await _ttsService.buildAudioSource(
-            script,
-            language: _playerLanguage,
-            pitch: 1.0,
-            rate: 0.6,
 
-            voiceStyle: voiceStyle,
-          )).$1;
+      final source = preloadedSource ?? buildTts.source;
+
       await _player.setAudioSource(
         source,
         preload: true,
-        initialPosition: Duration(seconds: 0),
+        initialPosition: Duration.zero,
       );
+
       _player.play();
 
-      // Start background sound if selected
       if (backgroundSound != null && backgroundSound != 'None') {
         this.backgroundSound.value = backgroundSound;
-        startBackgroundSound(backgroundSound);
+        await startBackgroundSound(backgroundSound);
       }
     } catch (e) {
       error.value = e.toString();
@@ -66,80 +75,117 @@ class MeditationPlayerController {
   }
 
   Future<void> setVolume(double volume) async {
-    print("setVolume ${volume}");
-    _player.setVolume(volume);
-    _backgroundSoundPlayer.setVolume(volume);
+    await _player.setVolume(volume);
+    await _backgroundSoundPlayer.setVolume(volume);
   }
 
   Future<void> startBackgroundSound(String backgroundSound) async {
-    // Map background sound names to audio files
     final backgroundSoundMap = {
       'Rain': 'assets/sounds/rain_sound.wav',
       'Nature': 'assets/sounds/nature_sound.wav',
       'Ambient Music': 'assets/sounds/ambient_sound.wav',
     };
-    final backgroundMap = {'Rain': 0, 'Nature': 1, 'Ambient Music': 2};
-    _backgroundSoundPlayer.seek(
-      Duration(seconds: 0),
-      index: backgroundMap[backgroundSound],
+
+    final keys = backgroundSoundMap.keys.toList(growable: false);
+    final values = backgroundSoundMap.values.toList(growable: false);
+
+    final index = keys.indexOf(backgroundSound);
+    if (index < 0) return;
+
+    // Плейлист фоновых звуков.
+    final playlist = ConcatenatingAudioSource(
+      useLazyPreparation: true,
+      children: values.map(AudioSource.asset).toList(growable: false),
     );
-    await _backgroundSoundPlayer.setAudioSources(
-      backgroundSoundMap.values.map((e) => AudioSource.asset(e)).toList(),
+
+    await _backgroundSoundPlayer.setAudioSource(
+      playlist,
+      preload: true,
+      initialIndex: index,
+      initialPosition: Duration.zero,
     );
+
     await _backgroundSoundPlayer.setLoopMode(LoopMode.all);
-    await _backgroundSoundPlayer.play();
+    _backgroundSoundPlayer.play();
   }
 
   Future<void> setBackgroundSound(String backgroundSound) async {
-    // Map background sound names to audio files
-    final backgroundMap = {'Rain': 0, 'Nature': 1, 'Ambient Music': 2};
-
-    // final soundFile = backgroundSoundMap[backgroundSound];
-
-    // if (soundFile != null) {
-
-    // _backgroundSoundPlayer.setVolume(1);
     this.backgroundSound.value = backgroundSound;
-    _backgroundSoundPlayer.setLoopMode(LoopMode.all);
-    _backgroundSoundPlayer.seek(
-      Duration(seconds: 0),
-      index: backgroundMap[backgroundSound],
-    );
-    _backgroundSoundPlayer.play();
 
-    print("setBackgroundSound ${backgroundMap[backgroundSound]}");
-    // }
+    if (backgroundSound == 'None') {
+      await _backgroundSoundPlayer.pause();
+      return;
+    }
+
+    // Если фон уже загружен плейлистом — просто прыгнем по index.
+    final idx = switch (backgroundSound) {
+      'Rain' => 0,
+      'Nature' => 1,
+      'Ambient Music' => 2,
+      _ => -1,
+    };
+    if (idx < 0) return;
+
+    await _backgroundSoundPlayer.seek(Duration.zero, index: idx);
+    _backgroundSoundPlayer.play();
   }
 
   Future<void> togglePlayPause() async {
-    print("isPlaying.value ${isPlaying.value}");
-    print("_player.playing ${_player.playing}");
-    print("_backgroundSoundPlayer.playing ${_backgroundSoundPlayer.playing}");
-    if (isPlaying.value) {
-      print("ON PAUSE");
-      _player.pause();
-      _backgroundSoundPlayer.pause();
+    if (_player.playing) {
+      await _player.pause();
+      await _backgroundSoundPlayer.pause();
     } else {
-      print("ON PLAY ${backgroundSound.value}");
-      _player.play();
+      await _player.play();
       if (backgroundSound.value != 'None') {
         _backgroundSoundPlayer.play();
       }
     }
   }
 
+  /// Глобальная перемотка на delta от текущей глобальной позиции.
   Future<void> seekBy(Duration delta) async {
-    final next = _player.position + delta;
-    final total = _player.duration ?? Duration.zero;
-    final clamped = next < Duration.zero
-        ? Duration.zero
-        : (next > total ? total : next);
-    await _player.seek(clamped);
+    await seekGlobal(position.value + delta);
   }
 
+  /// Глобальная перемотка (секунды от начала всей дорожки).
   Future<void> seek(int seconds) async {
-    ;
-    await _player.seek(Duration(seconds: seconds));
+    await seekGlobal(Duration(seconds: seconds));
+  }
+
+  /// Глобальный seek: переводим target в (index, offset) и вызываем seek(offset, index: i).
+  Future<void> seekGlobal(Duration target) async {
+    if (_chunkDurations.isEmpty) return;
+
+    // clamp to [0..trackDuration]
+    if (target <= Duration.zero) {
+      _player.seek(Duration.zero, index: 0);
+      return;
+    }
+
+    final total = trackDuration.value;
+    if (total > Duration.zero && target >= total) {
+      final last = _chunkDurations.length - 1;
+      final lastPos = _chunkDurations[last];
+      _player.seek(lastPos, index: last);
+      return;
+    }
+
+    // Найдём i: prefix[i] <= target < prefix[i] + chunkDurations[i]
+    var i = 0;
+    while (i + 1 < _chunkDurations.length &&
+        target >= _prefix[i] + _chunkDurations[i]) {
+      i++;
+    }
+
+    final within = target - _prefix[i];
+
+    // Внутри чанка тоже клампим.
+    final chunkLen = _chunkDurations[i];
+    final clampedWithin = within < Duration.zero
+        ? Duration.zero
+        : (within > chunkLen ? chunkLen : within);
+
+    await _player.seek(clampedWithin, index: i);
   }
 
   Future<void> stop() async {
@@ -159,73 +205,42 @@ class MeditationPlayerController {
     _backgroundSoundPlayer.dispose();
   }
 
-  String readTime(Duration duration) {
-    final minutes = duration.inMinutes.remainder(60);
-    final seconds = duration.inSeconds.remainder(60);
+  String readTime(Duration d) {
+    final minutes = d.inMinutes.remainder(60);
+    final seconds = d.inSeconds.remainder(60);
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
+  void _setChunkDurations(List<Duration> d) {
+    _chunkDurations = List<Duration>.from(d);
+
+    final prefix = List<Duration>.filled(_chunkDurations.length, Duration.zero);
+    var acc = Duration.zero;
+    for (var i = 0; i < _chunkDurations.length; i++) {
+      prefix[i] = acc;
+      acc += _chunkDurations[i];
+    }
+    _prefix = prefix;
+  }
+
   void _bindPlayerStreams() {
-    _positionSub ??= _player.positionStream.listen(
-      (value) => position.value = value,
-    );
+    // Глобальная позиция: prefix[currentIndex] + localPosition
+    _positionSub ??= _player.positionStream.listen((localPos) {
+      final idx = _player.currentIndex ?? 0;
+      final base = (idx >= 0 && idx < _prefix.length)
+          ? _prefix[idx]
+          : Duration.zero;
+      position.value = base + localPos;
+    });
+
     _durationSub ??= _player.durationStream.listen((value) {
       duration.value = value ?? Duration.zero;
-      print("VCDSVSDVSDsd ${value?.inSeconds}");
     });
-    _playingSub ??= _player.playingStream.listen(
-      (value) => isPlaying.value = value,
-    );
+
+    _playingSub ??= _player.playingStream.listen((value) {
+      isPlaying.value = value;
+    });
   }
-}
-
-Future<Duration> wavAssetDuration(String assetPath) async {
-  final data = await rootBundle.load(assetPath);
-  final bytes = data.buffer.asUint8List();
-  final bd = ByteData.sublistView(bytes);
-
-  int u16le(int o) => bd.getUint16(o, Endian.little);
-  int u32le(int o) => bd.getUint32(o, Endian.little);
-
-  // "RIFF"...."WAVE"
-  if (bytes.length < 12 ||
-      String.fromCharCodes(bytes.sublist(0, 4)) != 'RIFF' ||
-      String.fromCharCodes(bytes.sublist(8, 12)) != 'WAVE') {
-    throw FormatException('Not a RIFF/WAVE file');
-  }
-
-  int offset = 12;
-
-  int? byteRate;
-  int? dataSize;
-
-  while (offset + 8 <= bytes.length) {
-    final id = String.fromCharCodes(bytes.sublist(offset, offset + 4));
-    final size = u32le(offset + 4);
-    final chunkDataStart = offset + 8;
-
-    if (chunkDataStart + size > bytes.length) break;
-
-    if (id == 'fmt ') {
-      // fmt chunk: byteRate at +8 from fmt start for PCM-like layouts
-      // (AudioFormat u16 at +0, NumChannels u16 +2, SampleRate u32 +4, ByteRate u32 +8, ...)
-      byteRate = u32le(chunkDataStart + 8);
-    } else if (id == 'data') {
-      dataSize = size;
-    }
-
-    // Chunks are word-aligned: pad to even.
-    offset = chunkDataStart + size + (size.isOdd ? 1 : 0);
-
-    if (byteRate != null && dataSize != null) break;
-  }
-
-  if (byteRate == null || dataSize == null || byteRate == 0) {
-    throw FormatException('Cannot determine WAV duration (missing fmt/data)');
-  }
-
-  final seconds = dataSize / byteRate;
-  return Duration(milliseconds: (seconds * 1000).round());
 }
 
 const _playerLanguage = 'en-US';
