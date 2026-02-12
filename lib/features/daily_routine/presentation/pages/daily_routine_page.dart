@@ -1,5 +1,8 @@
 import 'dart:ui' as ui;
 
+import 'package:ai_meditation/core/ui/bottom_sheet_util.dart';
+import 'package:ai_meditation/features/generation/domain/entities/generation_options.dart';
+import 'package:ai_meditation/features/generation/presentation/pages/generation_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +38,14 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
   void initState() {
     super.initState();
     _controller = getIt<DailyRoutineController>();
+  }
+
+  void _showBottomSheet(BuildContext context, Widget child) {
+    showMyBootomSheet(
+      context,
+      height: MediaQuery.of(context).size.height * 0.9,
+      child: child,
+    );
   }
 
   @override
@@ -143,14 +154,19 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
 
   void _onCardTap(DailyRoutineActivity activity) {
     if (activity is DailyRoutineMeditation) {
-      final args = RoutineMeditationArgs(
-        title: activity.title,
+      final presets = GenerationOptions(
         goal: activity.goal,
         durationMinutes: activity.durationMinutes,
         voiceStyle: activity.voiceStyle,
         backgroundSound: activity.backgroundSound,
       );
-      context.push(AppRoutes.player, extra: args);
+
+      _showBottomSheet(
+        context,
+        GenerationPage(
+          presets: presets,
+        ), // presets применятся, но сохраняться не должны
+      );
       return;
     }
 

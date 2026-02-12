@@ -36,12 +36,15 @@ class DailyRoutineController {
     'Slow and steady',
   ];
 
-  static const _breathingMoods = ['Calm', 'Neutral', 'Stressed', 'Anxius'];
+  // Presets (как ты перечислил)
+  static const _goals = ['Calm', 'Neutral', 'Stressed', 'Anxious'];
+  static const _voices = ['Soft', 'Neutral', 'Deep', 'Warm'];
+  static const _backgroundSounds = ['nature', 'ambient music', 'rain', 'none'];
 
-  int _seedFromDate(DateTime d) {
-    // стабильный сид на день: YYYYMMDD
-    return d.year * 10000 + d.month * 100 + d.day;
-  }
+  // Для breathing используем те же значения, чтобы их можно было переиспользовать в GenerationPage
+  static const _breathingMoods = _goals;
+
+  int _seedFromDate(DateTime d) => d.year * 10000 + d.month * 100 + d.day;
 
   T _pick<T>(Random rng, List<T> items) => items[rng.nextInt(items.length)];
 
@@ -51,13 +54,18 @@ class DailyRoutineController {
     switch (mood) {
       case 'Calm':
         return (inhale: 4, exhale: 6);
+
+      case 'Neutral':
+        return (inhale: 4, exhale: 4);
+
       case 'Stressed':
         // "прячем" hold внутри inhale/exhale блоков (UI не меняем)
         return (inhale: 8, exhale: 8);
-      case 'Anxius':
+
+      case 'Anxious':
         // 4-7-8: inhale(4)+hold(7)=11, exhale(8)
         return (inhale: 11, exhale: 8);
-      case 'Neutral':
+
       default:
         return (inhale: 4, exhale: 4);
     }
@@ -91,12 +99,26 @@ class DailyRoutineController {
       'Quiet reflection before rest',
     ]);
 
+    // Breathing mood/pattern
     final breathingMood = _pick(rng, _breathingMoods);
     final breathingPattern = _patternForMood(breathingMood);
 
     final modifier1 = _pick(rng, _modifiers);
     final modifier2 = _pick(rng, _modifiers);
     final modifier3 = _pick(rng, _modifiers);
+
+    // Meditation presets (Goals/Voices/Background Sound)
+    final morningGoal = _pick(rng, _goals);
+    final morningVoice = _pick(rng, _voices);
+    final morningSound = _pick(rng, _backgroundSounds);
+
+    final afternoonGoal = _pick(rng, _goals);
+    final afternoonVoice = _pick(rng, _voices);
+    final afternoonSound = _pick(rng, _backgroundSounds);
+
+    final eveningGoal = _pick(rng, _goals);
+    final eveningVoice = _pick(rng, _voices);
+    final eveningSound = _pick(rng, _backgroundSounds);
 
     final items = <DailyRoutineActivity>[
       DailyRoutineMeditation(
@@ -105,13 +127,9 @@ class DailyRoutineController {
         durationMinutes: morningDuration,
         imageAsset: 'assets/images/morning_meditation.png',
         badgeText: 'DAY START',
-        goal: _pick(rng, const ['relax', 'focus', 'energize']),
-        voiceStyle: _pick(rng, const ['soft', 'neutral', 'warm']),
-        backgroundSound: _pick(rng, const [
-          'Gentle waves',
-          'None',
-          'Light wind',
-        ]),
+        goal: morningGoal,
+        voiceStyle: morningVoice,
+        backgroundSound: morningSound,
       ),
       DailyRoutineBreathing(
         title: 'Afternoon breathing',
@@ -119,15 +137,11 @@ class DailyRoutineController {
             '${_pick(rng, const ['Calm inhalations with steady counts', 'Reset with paced breathing', 'Slow breath to regain control'])} · $modifier2',
         durationMinutes: afternoonDuration,
         imageAsset: 'assets/images/daily_routine.svg',
-        // ВАЖНО: badgeText используем как mood, т.к. в DailyRoutinePage ты передаёшь badgeText в updateMood()
+        // badgeText используем как mood (ты дальше его прокидываешь в updateMood)
         badgeText: breathingMood,
-        goal: _pick(rng, const ['relax', 'focus', 'calm']),
-        voiceStyle: _pick(rng, const ['neutral', 'soft', 'warm']),
-        backgroundSound: _pick(rng, const [
-          'None',
-          'Gentle waves',
-          'Night forest',
-        ]),
+        goal: afternoonGoal,
+        voiceStyle: afternoonVoice,
+        backgroundSound: afternoonSound,
         inhaleSeconds: breathingPattern.inhale,
         exhaleSeconds: breathingPattern.exhale,
       ),
@@ -137,13 +151,9 @@ class DailyRoutineController {
         durationMinutes: eveningDuration,
         imageAsset: 'assets/images/evening_meditation.png',
         badgeText: 'NIGHT WIND-DOWN',
-        goal: _pick(rng, const ['sleep', 'relax', 'recover']),
-        voiceStyle: _pick(rng, const ['warm', 'soft', 'neutral']),
-        backgroundSound: _pick(rng, const [
-          'Night forest',
-          'None',
-          'Gentle waves',
-        ]),
+        goal: eveningGoal,
+        voiceStyle: eveningVoice,
+        backgroundSound: eveningSound,
       ),
     ];
 
