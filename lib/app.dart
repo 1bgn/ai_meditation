@@ -15,10 +15,6 @@ class _AiMeditationAppState extends State<AiMeditationApp> {
   late final GoRouter _router = AppRouter.create();
 
   @override
-  Widget build(BuildContext context) => MaterialApp.router(
-  
-        theme: AppTheme.light(),
-        
-        routerConfig: _router,
-      );
+  Widget build(BuildContext context) =>
+      MaterialApp.router(theme: AppTheme.light(), routerConfig: _router);
 }

@@ -23,8 +23,8 @@ class BreathingSessionController {
 
     _mood = mood;
     _onSessionEnd = onSessionEnd;
-    // totalDuration.value =
-    //     duration ?? const Duration(minutes: 5); // Default to 5 minutes
+    totalDuration.value =
+        duration ?? const Duration(minutes: 5); // Default to 5 minutes
     //  totalDuration.value =
     //     Duration(seconds: 0);
     timeRemaining.value = totalDuration.value;

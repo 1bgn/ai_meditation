@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class GlassConcaveTabBar extends StatelessWidget {
-  const GlassConcaveTabBar({
+  GlassConcaveTabBar({
     super.key,
     required this.currentIndex,
     required this.onChanged,
@@ -15,14 +15,7 @@ class GlassConcaveTabBar extends StatelessWidget {
     this.iconColor = const Color(0xFF8D8D8D),
     this.selectedIconColor = Colors.black,
     this.borderColor = const Color(0x66FFFFFF),
-    this.glassSettings = const LiquidGlassSettings(
-      thickness: 20,
-      blur: 10,
-      glassColor: Color(0x22FFFFFF),
-      lightAngle: 60,
-      lightIntensity: 2,
-      saturation: 1,
-    ),
+    this.glassSettings,
     this.borderRadius = 28,
   });
 
@@ -38,14 +31,21 @@ class GlassConcaveTabBar extends StatelessWidget {
   final Color selectedIconColor;
   final Color borderColor;
 
-  final LiquidGlassSettings glassSettings;
+  LiquidGlassSettings? glassSettings;
   final double borderRadius;
 
   @override
   Widget build(BuildContext context) {
     final barShape = LiquidRoundedSuperellipse(borderRadius: 100);
     final br = BorderRadius.circular(borderRadius);
-
+    glassSettings ??= LiquidGlassSettings(
+      thickness: 20,
+      blur: 10,
+      glassColor: Colors.white.withOpacity(0.8),
+      lightAngle: 60,
+      lightIntensity: 2,
+      saturation: 1,
+    );
     return SafeArea(
       top: false,
       child: SizedBox(
@@ -53,7 +53,7 @@ class GlassConcaveTabBar extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(0),
           child: LiquidGlassLayer(
-            settings: glassSettings,
+            settings: glassSettings!,
             child: ClipRRect(
               borderRadius: br,
               child: LayoutBuilder(
@@ -150,7 +150,7 @@ class _ConcaveTabItem extends StatelessWidget {
               fontWeight: FontWeight.w700,
               height: 12 / 10,
               letterSpacing: -0.5,
-              color: Colors.black,
+              color: selected ? Colors.black : Colors.grey,
             ),
           ),
         ],

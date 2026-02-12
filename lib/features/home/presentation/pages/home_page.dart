@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:ai_meditation/core/ui/glass_concave_tab_bar.dart';
 import 'package:ai_meditation/features/daily_routine/domain/entities/daily_routine_activity.dart';
 import 'package:ai_meditation/features/daily_routine/presentation/pages/start_routine_page.dart';
@@ -35,249 +34,283 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) => Scaffold(
     body: SafeArea(
-      child: AdaptiveScaffold(
-        bottomNavigationBar: AdaptiveBottomNavigationBar(
-          useNativeBottomBar:
-              true, // Enable native iOS 26 UITabBar with Liquid Glass effects (default)
-          items: [
-            AdaptiveNavigationDestination(
-              // icon: dynamic → SF Symbol (iOS) или IconData (кроссплатформенно)
-              icon: PlatformInfo.isIOS ? 'house.fill' : Icons.home,
-              label: 'Home',
-            ),
-            AdaptiveNavigationDestination(
-              icon: PlatformInfo.isIOS ? 'magnifyingglass' : Icons.search,
-              label: 'Search',
-            ),
-          ],
-          selectedIndex: 0,
-          onTap: (index) {},
-        ),
-        body: Stack(
-          children: [
-            Positioned.fill(
-              child: Image.asset(
-                "assets/images/home_bg.png",
-                fit: BoxFit.cover,
-              ),
-            ),
-            Positioned.fill(
-              child: ListView(
-                children: [
-                  SizedBox(height: 32),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          text: "Hello, ",
-                          style: TextStyle(
-                            fontFamily: "Amstelvar",
-                            fontSize: 24,
-                            height: 32 / 24,
-                            letterSpacing: -1.5,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.black,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: "Vitalii",
-                              style: GoogleFonts.funnelDisplay(
-                                fontSize: 24,
-                                height: 32 / 24,
-                                letterSpacing: -1.5,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.black,
-                                fontStyle: FontStyle.normal,
-                              ),
-                            ),
-                          ],
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset("assets/images/home_bg.png", fit: BoxFit.cover),
+          ),
+          Positioned.fill(
+            child: ListView(
+              children: [
+                SizedBox(height: 32),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    RichText(
+                      text: TextSpan(
+                        text: "Hello, ",
+                        style: TextStyle(
+                          fontFamily: "Amstelvar",
+                          fontSize: 24,
+                          height: 32 / 24,
+                          letterSpacing: -1.5,
+                          fontStyle: FontStyle.italic,
+                          color: Colors.black,
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              text: "How are you ",
-                              style: TextStyle(
-                                fontFamily: "Amstelvar",
-                                fontSize: 48,
-                                height: 52 / 48,
-                                letterSpacing: -1.5,
-                                fontWeight: FontWeight.w400,
-                                fontStyle: FontStyle.italic,
-                                color: Colors.black,
-                                fontVariations: [FontVariation('wght', 300)],
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: "feeling ",
-                                  style: GoogleFonts.funnelDisplay(
-                                    fontSize: 48,
-                                    height: 52 / 48,
-                                    letterSpacing: -1.5,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                    fontStyle: FontStyle.normal,
-                                  ),
-                                  children: [
-                                    TextSpan(
-                                      text: "today?",
-                                      style: TextStyle(
-                                        fontFamily: "Amstelvar",
-                                        fontSize: 48,
-                                        fontWeight: FontWeight.w400,
-                                        height: 52 / 48,
-                                        letterSpacing: -1.5,
-                                        fontStyle: FontStyle.italic,
-                                        color: Colors.black,
-                                        fontVariations: [
-                                          FontVariation('wght', 300),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                        children: [
+                          TextSpan(
+                            text: "Vitalii",
+                            style: GoogleFonts.funnelDisplay(
+                              fontSize: 24,
+                              height: 32 / 24,
+                              letterSpacing: -1.5,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black,
+                              fontStyle: FontStyle.normal,
                             ),
                           ),
-                        ),
+                        ],
                       ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 32),
-
-                  Container(
-                    padding: EdgeInsets.only(left: 0, right: 0, top: 16),
-                    decoration: BoxDecoration(
-                      color: const Color.fromRGBO(255, 255, 255, 0.48),
-                      borderRadius: BorderRadius.circular(40),
                     ),
-                    child: ClipRRect(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(40),
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color.fromRGBO(255, 255, 255, 0),
-                              Color.fromRGBO(255, 255, 255, 1),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 32),
+                        child: RichText(
+                          textAlign: TextAlign.center,
+                          text: TextSpan(
+                            text: "How are you ",
+                            style: TextStyle(
+                              fontFamily: "Amstelvar",
+                              fontSize: 48,
+                              height: 52 / 48,
+                              letterSpacing: -1.5,
+                              fontWeight: FontWeight.w400,
+                              fontStyle: FontStyle.italic,
+                              color: Colors.black,
+                              fontVariations: [FontVariation('wght', 300)],
+                            ),
+                            children: [
+                              TextSpan(
+                                text: "feeling ",
+                                style: GoogleFonts.funnelDisplay(
+                                  fontSize: 48,
+                                  height: 52 / 48,
+                                  letterSpacing: -1.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black,
+                                  fontStyle: FontStyle.normal,
+                                ),
+                                children: [
+                                  TextSpan(
+                                    text: "today?",
+                                    style: TextStyle(
+                                      fontFamily: "Amstelvar",
+                                      fontSize: 48,
+                                      fontWeight: FontWeight.w400,
+                                      height: 52 / 48,
+                                      letterSpacing: -1.5,
+                                      fontStyle: FontStyle.italic,
+                                      color: Colors.black,
+                                      fontVariations: [
+                                        FontVariation('wght', 300),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ],
                           ),
                         ),
-                        child: Stack(
-                          children: [
-                            Stack(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.all(2),
-                                  child: Image.asset(
-                                    "assets/images/home_bg.png",
-                                    opacity: const AlwaysStoppedAnimation(.68),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Positioned.fill(
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 0,
-                                ),
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: _ActionButton(
-                                                  title: 'Generate Meditation'
-                                                      .toUpperCase(),
-                                                  position:
-                                                      _ActionButtonPosition.top,
-                                                  iconAsset:
-                                                      'assets/images/generate_mediation.svg',
-                                                  onPressed: () =>
-                                                      _showGenerationSheet(
-                                                        context,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: _ActionButton(
-                                                  title: 'Breathing Exercise'
-                                                      .toUpperCase(),
-                                                  position:
-                                                      _ActionButtonPosition
-                                                          .middle,
-                                                  iconAsset:
-                                                      'assets/images/breathing_exercise.svg',
-                                                  onPressed: () =>
-                                                      _showBreathingSheet(
-                                                        context,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: _ActionButton(
-                                                  title: 'Daily Routine'
-                                                      .toUpperCase(),
-                                                  position:
-                                                      _ActionButtonPosition
-                                                          .bottom,
-                                                  iconAsset:
-                                                      'assets/images/daily_routine.svg',
-                                                  onPressed: () =>
-                                                      _showRoutineSheet(
-                                                        context,
-                                                      ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
+                      ),
+                    ),
+                  ],
+                ),
 
-                                    Divider(
-                                      color: Color.fromRGBO(17, 17, 17, 0.04),
+                const SizedBox(height: 32),
+
+                Container(
+                  padding: EdgeInsets.only(left: 0, right: 0, top: 16),
+                  decoration: BoxDecoration(
+                    color: const Color.fromRGBO(255, 255, 255, 0.48),
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                  child: ClipRRect(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(40),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Color.fromRGBO(255, 255, 255, 0),
+                            Color.fromRGBO(255, 255, 255, 1),
+                          ],
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(2),
+                                child: Image.asset(
+                                  "assets/images/home_bg.png",
+                                  opacity: const AlwaysStoppedAnimation(.68),
+                                ),
+                              ),
+                            ],
+                          ),
+                          Positioned.fill(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 0,
+                              ),
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
                                     ),
-                                    const SizedBox(height: 24),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _ActionButton(
+                                                title: 'Generate Meditation'
+                                                    .toUpperCase(),
+                                                position:
+                                                    _ActionButtonPosition.top,
+                                                iconAsset:
+                                                    'assets/images/generate_mediation.svg',
+                                                onPressed: () =>
+                                                    _showGenerationSheet(
+                                                      context,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _ActionButton(
+                                                title: 'Breathing Exercise'
+                                                    .toUpperCase(),
+                                                position: _ActionButtonPosition
+                                                    .middle,
+                                                iconAsset:
+                                                    'assets/images/breathing_exercise.svg',
+                                                onPressed: () =>
+                                                    _showBreathingSheet(
+                                                      context,
+                                                    ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: _ActionButton(
+                                                title: 'Daily Routine'
+                                                    .toUpperCase(),
+                                                position: _ActionButtonPosition
+                                                    .bottom,
+                                                iconAsset:
+                                                    'assets/images/daily_routine.svg',
+                                                onPressed: () =>
+                                                    _showRoutineSheet(context),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+
+                                  Divider(
+                                    color: Color.fromRGBO(17, 17, 17, 0.04),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          "Today’s Meditation",
+                                          style: GoogleFonts.funnelDisplay(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                            height: 24 / 16,
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                        Text(
+                                          _controller.currentDateString(),
+                                          style: GoogleFonts.funnelDisplay(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w400,
+                                            height: 20 / 14,
+                                            color: Color(0xff90939F),
+                                            letterSpacing: -0.5,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                    ),
+                                    child: Column(
+                                      children: [
+                                        _MeditationCard(
+                                          item: DailyRoutineMeditation(
+                                            title: "Calm",
+                                            backgroundSound: "Ambient Music",
+                                            badgeText: "CSDVCdsvs",
+                                            description:
+                                                "Take a quick meditation break",
+                                            durationMinutes: 4,
+                                            goal: "Calm",
+                                            voiceStyle: "",
+                                            imageAsset:
+                                                "assets/images/breath1.jpg",
+                                          ),
+                                          imageAsset:
+                                              "assets/images/breath1.jpg",
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(height: 24),
+
+                                  Divider(
+                                    color: Color.fromRGBO(17, 17, 17, 0.04),
+                                  ),
+                                  const SizedBox(height: 24),
+                                  Column(
+                                    children: [
+                                      Row(
                                         children: [
+                                          SizedBox(width: 16),
                                           Text(
-                                            "Today’s Meditation",
+                                            "Recommended Sessions",
                                             style: GoogleFonts.funnelDisplay(
                                               fontSize: 16,
                                               fontWeight: FontWeight.w600,
@@ -285,141 +318,65 @@ class _HomePageState extends State<HomePage> {
                                               letterSpacing: -0.5,
                                             ),
                                           ),
-                                          Text(
-                                            _controller.currentDateString(),
-                                            style: GoogleFonts.funnelDisplay(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w400,
-                                              height: 20 / 14,
-                                              color: Color(0xff90939F),
-                                              letterSpacing: -0.5,
-                                            ),
-                                          ),
                                         ],
                                       ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
+                                      SizedBox(height: 12),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16,
+                                        ),
+                                        child: _TabBar(),
                                       ),
-                                      child: Column(
+                                      SizedBox(height: 12),
+                                      Row(
                                         children: [
-                                          _MeditationCard(
-                                            item: DailyRoutineMeditation(
-                                              title: "Calm",
-                                              backgroundSound: "Ambient Music",
-                                              badgeText: "CSDVCdsvs",
-                                              description:
-                                                  "Take a quick meditation break",
-                                              durationMinutes: 4,
-                                              goal: "Calm",
-                                              voiceStyle: "",
-                                              imageAsset:
-                                                  "assets/images/breath1.jpg",
+                                          Expanded(
+                                            child: SingleChildScrollView(
+                                              scrollDirection: Axis.horizontal,
+                                              child: Row(
+                                                children: [
+                                                  SizedBox(width: 16),
+
+                                                  _RecomentationItem(number: 1),
+                                                  _RecomentationItem(number: 2),
+                                                  _RecomentationItem(number: 3),
+                                                ],
+                                              ),
                                             ),
-                                            imageAsset:
-                                                "assets/images/breath1.jpg",
                                           ),
                                         ],
                                       ),
-                                    ),
-                                    const SizedBox(height: 24),
-
-                                    Divider(
-                                      color: Color.fromRGBO(17, 17, 17, 0.04),
-                                    ),
-                                    const SizedBox(height: 24),
-                                    Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            SizedBox(width: 16),
-                                            Text(
-                                              "Recommended Sessions",
-                                              style: GoogleFonts.funnelDisplay(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                                height: 24 / 16,
-                                                letterSpacing: -0.5,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(height: 12),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 16,
-                                          ),
-                                          child: _TabBar(),
-                                        ),
-                                        SizedBox(height: 12),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: SingleChildScrollView(
-                                                scrollDirection:
-                                                    Axis.horizontal,
-                                                child: Row(
-                                                  children: [
-                                                    SizedBox(width: 16),
-
-                                                    _RecomentationItem(
-                                                      number: 1,
-                                                    ),
-                                                    _RecomentationItem(
-                                                      number: 2,
-                                                    ),
-                                                    _RecomentationItem(
-                                                      number: 3,
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                                    ],
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                ],
+                ),
+              ],
+            ),
+          ),
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28.0),
+                child: GlassConcaveTabBar(
+                  currentIndex: 0,
+                  onChanged: (i) {},
+                  icons: [
+                    ("assets/images/home.svg", "Home"),
+                    ("assets/images/history.svg", "History"),
+                  ],
+                ),
               ),
             ),
-            // Positioned.fill(
-            //   child: Align(
-            //     alignment: Alignment.bottomCenter,
-            //     child: Padding(
-            //       padding: const EdgeInsets.symmetric(horizontal: 28.0),
-            //       child: ,
-            //     ),
-            //   ),
-            // ),
-            // Positioned.fill(
-            //   child: Align(
-            //     alignment: Alignment.bottomCenter,
-            //     child: Padding(
-            //       padding: const EdgeInsets.symmetric(horizontal: 28.0),
-            //       child: GlassConcaveTabBar(
-            //         currentIndex: 0,
-            //         onChanged: (i) {},
-            //         icons: [
-            //           ("assets/images/home.svg", "Home"),
-            //           ("assets/images/history.svg", "History"),
-            //         ],
-            //       ),
-            //     ),
-            //   ),
-            // ),
-          ],
-        ),
+          ),
+        ],
       ),
     ),
   );
