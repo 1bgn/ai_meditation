@@ -28,6 +28,7 @@ class BreathingSessionController {
 
     totalDuration.value = duration ?? const Duration(minutes: 5);
     timeRemaining.value = totalDuration.value;
+    print("VDSVSDV");
 
     _applyMoodPattern(_mood);
 

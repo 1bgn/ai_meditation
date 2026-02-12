@@ -1,9 +1,16 @@
+import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:ai_meditation/features/breathing/presentation/pages/breathing_session_page.dart';
+import 'package:ai_meditation/features/paywall/presentation/controllers/paywall_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../../core/di/injection_container.dart';
+import '../../../../core/ui/bottom_sheet_util.dart';
+import '../../../generation/presentation/pages/generation_page.dart';
 
 class RecomentationItem extends StatelessWidget {
   final int number;
@@ -39,8 +46,23 @@ class RecomentationItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        context.push("/paywall");
+      onTap: () async {
+        if (Platform.isIOS) {
+          final m = getIt<PaywallController>();
+          await m.init();
+
+          if (!m.hasPremium.value) {
+            await  context.push("/paywall");
+
+            await m.refreshStatus();
+            if (!m.hasPremium.value) return;
+          }
+        }
+        showMyBootomSheet(
+          context,
+          height: MediaQuery.of(context).size.height * 0.9,
+          child:  BreathingSessionPage(),
+        );
       },
       child: Container(
         width: 157,

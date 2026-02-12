@@ -1,25 +1,3 @@
-{
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "ai_meditation",
-            "request": "launch",
-            "type": "dart"
-        },
-        {
-            "name": "ai_meditation (profile mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "profile"
-        },
-        {
-            "name": "ai_meditation (release mode)",
-            "request": "launch",
-            "type": "dart",
-            "flutterMode": "release"
-        }
-    ]
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:3686757059783c78a24cda79f9c81b1e34bedba36106501ca813410211a1faed
+size 717

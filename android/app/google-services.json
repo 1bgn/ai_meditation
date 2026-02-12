@@ -1,29 +1,3 @@
-{
-  "project_info": {
-    "project_number": "718081668961",
-    "project_id": "sonicforgeflow",
-    "storage_bucket": "sonicforgeflow.firebasestorage.app"
-  },
-  "client": [
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:718081668961:android:786055fa35a5a71d32f720",
-        "android_client_info": {
-          "package_name": "com.nicfuno.sonicforgeflow"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyA5NTK31F-McDvcs6biLi4PXBmweSOB2vg"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    }
-  ],
-  "configuration_version": "1"
-}
+version https://git-lfs.github.com/spec/v1
+oid sha256:00a1d70fd70975bceb1ff393059b290cad99f8685adab74a9fd0cc4fb845af5e
+size 684
