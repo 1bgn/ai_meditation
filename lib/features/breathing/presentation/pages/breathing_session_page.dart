@@ -18,27 +18,40 @@ class _BreathingSessionPageState extends State<BreathingSessionPage> {
   late final BreathingSessionController _controller;
   late final BreathingController _breathingController;
 
+  String? _mood;
+  Duration? _duration;
+
   @override
   void initState() {
     super.initState();
     _controller = getIt<BreathingSessionController>();
     _breathingController = getIt<BreathingController>();
 
-    // Pass mood and duration from breathing controller to session controller
-    final mood = _breathingController.options.value.mood;
+    _mood = _breathingController.options.value.mood;
+
     final durationMinutes = _breathingController.options.value.durationMinutes;
-    final duration = durationMinutes != null
+    _duration = durationMinutes != null
         ? Duration(minutes: durationMinutes)
         : null;
 
+    _startSession();
+  }
+
+  void _startSession() {
     _controller.start(
-      mood: mood,
-      duration: duration,
+      mood: _mood,
+      duration: _duration,
       onSessionEnd: _showCongrats,
     );
   }
 
+  void _restartSession() {
+    _controller.stop();
+    _startSession();
+  }
+
   void _showCongrats() {
+    if (!mounted) return;
     Navigator.of(context).pop(true);
   }
 
@@ -69,7 +82,7 @@ class _BreathingSessionPageState extends State<BreathingSessionPage> {
                   duration: const Duration(milliseconds: 800),
                   width: _controller.isInhale.value ? 343 : 233,
                   height: _controller.isInhale.value ? 343 : 233,
-                  decoration: BoxDecoration(),
+                  decoration: const BoxDecoration(),
                   child: Image.asset("assets/images/breath_img.png"),
                 ),
               ),
@@ -132,9 +145,7 @@ class _BreathingSessionPageState extends State<BreathingSessionPage> {
                       svgAssetPath: "assets/images/volume.svg",
                     ),
                     ConcaveCircleButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: _restartSession,
                       iconSize: 15,
                       svgAssetPath: "assets/images/repeat.svg",
                     ),
