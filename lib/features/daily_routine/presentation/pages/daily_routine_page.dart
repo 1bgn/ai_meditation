@@ -15,7 +15,6 @@ import '../../../../core/ui/concave_circle_button.dart';
 import '../../../../core/ui/slide_to_start.dart';
 import '../../domain/entities/daily_routine_activity.dart';
 import '../controllers/daily_routine_controller.dart';
-import '../models/routine_meditation_args.dart';
 import '../../../../features/breathing/presentation/controllers/breathing_controller.dart';
 
 class DailyRoutinePage extends StatefulWidget {
@@ -48,16 +47,50 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
     );
   }
 
+  Future<void> _startNext() async {
+    final activity = await _controller.startNextActivity();
+    if (!mounted) return;
+
+    if (activity == null) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Routine completed')));
+      return;
+    }
+
+    _onCardTap(activity);
+  }
+
+  void _reshuffleToday() {
+    // перегенерить рутину (контроллер у тебя сбрасывает прогресс при reshuffle=true)
+    _controller.refreshRoutine(DateTime.now(), true);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xffF6F7FA),
+      backgroundColor: const Color(0xffF6F7FA),
       body: SafeArea(
         bottom: false,
         child: Column(
           children: [
             const SizedBox(height: 16),
-            _RoutineHeader(onClose: () => Navigator.of(context).maybePop()),
+            _RoutineHeader(
+              onLike: () async {
+                final didSave = await _controller.saveAllItemsToHistory();
+                if (!mounted) return;
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      didSave ? 'Routine saved to history' : 'Already saved',
+                    ),
+                  ),
+                );
+              },
+              onClose: () => Navigator.of(context).maybePop(),
+              onRepeat: _reshuffleToday,
+            ),
             const SizedBox(height: 24),
             Expanded(
               child: Padding(
@@ -101,33 +134,21 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
               ),
             ),
             const SizedBox(height: 6),
-
             Container(
               decoration: BoxDecoration(
-                color: Color(0xffF6F7FA).withOpacity(0.92),
+                color: const Color(0xffF6F7FA).withOpacity(0.92),
                 border: Border.all(color: Colors.white, width: 1),
-                borderRadius: BorderRadius.all(Radius.circular(24)),
+                borderRadius: const BorderRadius.all(Radius.circular(24)),
               ),
               child: Column(
                 children: [
                   const SizedBox(height: 16),
-
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: SlideToStart(
                       label: 'START',
                       enabled: true,
-                      onComplete: () async {
-                        await _controller.completeRoutine(
-                          nextDay: DateTime.now().add(const Duration(days: 1)),
-                        );
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Daily routine saved to history'),
-                          ),
-                        );
-                      },
+                      onComplete: _startNext, // <-- главное изменение
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -165,7 +186,7 @@ class _DailyRoutinePageState extends State<DailyRoutinePage> {
         context,
         GenerationPage(
           presets: presets,
-        ), // presets применятся, но сохраняться не должны
+        ), // пресеты применятся, но не сохраняются
       );
       return;
     }
@@ -223,7 +244,7 @@ class _MeditationCard extends StatelessWidget {
                               Colors.black.withOpacity(0.5),
                               Colors.black.withOpacity(0.0),
                             ],
-                            stops: [0.0, 1.0],
+                            stops: const [0.0, 1.0],
                             begin: Alignment.bottomCenter,
                             end: Alignment.topCenter,
                           ),
@@ -320,8 +341,7 @@ class _BreathingCard extends StatelessWidget {
       width: 88,
       height: 88,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(119, 201, 126, 0.16),
-
+        color: const Color.fromRGBO(119, 201, 126, 0.16),
         borderRadius: BorderRadius.circular(18),
       ),
       child: Center(child: SvgPicture.asset(imageAsset, width: 40)),
@@ -353,15 +373,13 @@ class _BreathingCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       "Calm your mind and body",
                       style: GoogleFonts.funnelDisplay(
                         fontSize: 14,
                         height: 20 / 14,
-                        color: Color(0xffAAAEBA),
+                        color: const Color(0xffAAAEBA),
                         letterSpacing: -0.5,
                         fontWeight: FontWeight.w400,
                       ),
@@ -373,13 +391,13 @@ class _BreathingCard extends StatelessWidget {
                         style: GoogleFonts.funnelDisplay(
                           fontSize: 14,
                           height: 20 / 14,
-                          color: Color(0xffAAAEBA),
+                          color: const Color(0xffAAAEBA),
                           letterSpacing: -0.5,
                           fontWeight: FontWeight.w400,
                         ),
                         children: [
                           TextSpan(
-                            text: "4 sec. ",
+                            text: "${item.inhaleSeconds} sec. ",
                             style: GoogleFonts.funnelDisplay(
                               fontSize: 14,
                               height: 20 / 14,
@@ -393,13 +411,13 @@ class _BreathingCard extends StatelessWidget {
                                 style: GoogleFonts.funnelDisplay(
                                   fontSize: 14,
                                   height: 20 / 14,
-                                  color: Color(0xffAAAEBA),
+                                  color: const Color(0xffAAAEBA),
                                   letterSpacing: -0.5,
                                   fontWeight: FontWeight.w400,
                                 ),
                               ),
                               TextSpan(
-                                text: " 6 sec.",
+                                text: " ${item.exhaleSeconds} sec.",
                                 style: GoogleFonts.funnelDisplay(
                                   fontSize: 14,
                                   height: 20 / 14,
@@ -425,9 +443,14 @@ class _BreathingCard extends StatelessWidget {
 }
 
 class _RoutineHeader extends StatelessWidget {
-  const _RoutineHeader({required this.onClose});
-
+  const _RoutineHeader({
+    required this.onClose,
+    required this.onRepeat,
+    required this.onLike,
+  });
+  final VoidCallback onLike;
   final VoidCallback onClose;
+  final VoidCallback onRepeat;
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -471,13 +494,13 @@ class _RoutineHeader extends StatelessWidget {
           child: Wrap(
             children: [
               ConcaveCircleButton(
-                onPressed: onClose,
+                onPressed: () {}, // оставил без логики, дизайн не меняем
                 svgAssetPath: 'assets/images/like.svg',
                 iconSize: 15,
               ),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               ConcaveCircleButton(
-                onPressed: onClose,
+                onPressed: onRepeat, // <-- теперь реально “перемешать”
                 svgAssetPath: 'assets/images/repeat.svg',
                 iconSize: 15,
               ),

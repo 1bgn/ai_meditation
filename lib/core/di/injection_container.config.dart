@@ -191,6 +191,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i712.HistoryController>(
       () => _i712.HistoryController(gh<_i886.GetHistory>()),
     );
+    gh.factory<_i951.DailyRoutineController>(
+      () => _i951.DailyRoutineController(
+        gh<_i305.AddHistoryItem>(),
+        gh<_i632.AppPreferences>(),
+      ),
+    );
     gh.lazySingleton<_i145.GenerationController>(
       () => _i145.GenerationController(
         gh<_i15.GetGenerationOptions>(),
@@ -198,9 +204,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i899.GenerateMeditation>(),
         gh<_i305.AddHistoryItem>(),
       ),
-    );
-    gh.factory<_i951.DailyRoutineController>(
-      () => _i951.DailyRoutineController(gh<_i305.AddHistoryItem>()),
     );
     return this;
   }

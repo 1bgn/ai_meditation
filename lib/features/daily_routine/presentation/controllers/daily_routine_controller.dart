@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:math';
 
+import 'package:ai_meditation/core/storage/app_preferences.dart';
 import 'package:injectable/injectable.dart';
 import 'package:signals/signals.dart';
 
@@ -9,11 +11,12 @@ import '../../domain/entities/daily_routine_activity.dart';
 
 @injectable
 class DailyRoutineController {
-  DailyRoutineController(this._addHistoryItem) {
+  DailyRoutineController(this._addHistoryItem, this._prefs) {
     refreshRoutine();
   }
 
   final AddHistoryItem _addHistoryItem;
+  final AppPreferences _prefs;
 
   final routineItems = signal<List<DailyRoutineActivity>>([]);
   final dayLabel = signal<String>('');
@@ -36,13 +39,35 @@ class DailyRoutineController {
     'Slow and steady',
   ];
 
-  // Presets (как ты перечислил)
+  // Presets
   static const _goals = ['Calm', 'Neutral', 'Stressed', 'Anxious'];
   static const _voices = ['Soft', 'Neutral', 'Deep', 'Warm'];
   static const _backgroundSounds = ['nature', 'ambient music', 'rain', 'none'];
 
-  // Для breathing используем те же значения, чтобы их можно было переиспользовать в GenerationPage
   static const _breathingMoods = _goals;
+  Future<bool> saveAllItemsToHistory({DateTime? forDate}) async {
+    final date = forDate ?? DateTime.now();
+
+    // защита от повторного сохранения
+    if (_prefs.getRoutineSaved(date)) return false;
+
+    final items = routineItems.value;
+    if (items.isEmpty) return false;
+
+    for (final item in items) {
+      final historyItem = MeditationHistoryItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        title: item.title,
+        durationMinutes: item.durationMinutes,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+      await _addHistoryItem.call(historyItem);
+    }
+
+    await _prefs.setRoutineSaved(date, true);
+    return true;
+  }
 
   int _seedFromDate(DateTime d) => d.year * 10000 + d.month * 100 + d.day;
 
@@ -54,18 +79,12 @@ class DailyRoutineController {
     switch (mood) {
       case 'Calm':
         return (inhale: 4, exhale: 6);
-
       case 'Neutral':
         return (inhale: 4, exhale: 4);
-
       case 'Stressed':
-        // "прячем" hold внутри inhale/exhale блоков (UI не меняем)
         return (inhale: 8, exhale: 8);
-
       case 'Anxious':
-        // 4-7-8: inhale(4)+hold(7)=11, exhale(8)
         return (inhale: 11, exhale: 8);
-
       default:
         return (inhale: 4, exhale: 4);
     }
@@ -75,8 +94,6 @@ class DailyRoutineController {
     final date = forDate ?? DateTime.now();
     final dayName = _weekdayNames[date.weekday - 1];
 
-    // По умолчанию рутина стабильна для текущего дня.
-    // Если reshuffle=true — можно перегенерить новую “случайную” прямо сейчас.
     final baseSeed = _seedFromDate(date);
     final seed = reshuffle
         ? (baseSeed ^ DateTime.now().millisecondsSinceEpoch)
@@ -99,26 +116,12 @@ class DailyRoutineController {
       'Quiet reflection before rest',
     ]);
 
-    // Breathing mood/pattern
     final breathingMood = _pick(rng, _breathingMoods);
     final breathingPattern = _patternForMood(breathingMood);
 
     final modifier1 = _pick(rng, _modifiers);
     final modifier2 = _pick(rng, _modifiers);
     final modifier3 = _pick(rng, _modifiers);
-
-    // Meditation presets (Goals/Voices/Background Sound)
-    final morningGoal = _pick(rng, _goals);
-    final morningVoice = _pick(rng, _voices);
-    final morningSound = _pick(rng, _backgroundSounds);
-
-    final afternoonGoal = _pick(rng, _goals);
-    final afternoonVoice = _pick(rng, _voices);
-    final afternoonSound = _pick(rng, _backgroundSounds);
-
-    final eveningGoal = _pick(rng, _goals);
-    final eveningVoice = _pick(rng, _voices);
-    final eveningSound = _pick(rng, _backgroundSounds);
 
     final items = <DailyRoutineActivity>[
       DailyRoutineMeditation(
@@ -127,9 +130,9 @@ class DailyRoutineController {
         durationMinutes: morningDuration,
         imageAsset: 'assets/images/morning_meditation.png',
         badgeText: 'DAY START',
-        goal: morningGoal,
-        voiceStyle: morningVoice,
-        backgroundSound: morningSound,
+        goal: _pick(rng, _goals),
+        voiceStyle: _pick(rng, _voices),
+        backgroundSound: _pick(rng, _backgroundSounds),
       ),
       DailyRoutineBreathing(
         title: 'Afternoon breathing',
@@ -137,11 +140,10 @@ class DailyRoutineController {
             '${_pick(rng, const ['Calm inhalations with steady counts', 'Reset with paced breathing', 'Slow breath to regain control'])} · $modifier2',
         durationMinutes: afternoonDuration,
         imageAsset: 'assets/images/daily_routine.svg',
-        // badgeText используем как mood (ты дальше его прокидываешь в updateMood)
         badgeText: breathingMood,
-        goal: afternoonGoal,
-        voiceStyle: afternoonVoice,
-        backgroundSound: afternoonSound,
+        goal: _pick(rng, _goals),
+        voiceStyle: _pick(rng, _voices),
+        backgroundSound: _pick(rng, _backgroundSounds),
         inhaleSeconds: breathingPattern.inhale,
         exhaleSeconds: breathingPattern.exhale,
       ),
@@ -151,14 +153,43 @@ class DailyRoutineController {
         durationMinutes: eveningDuration,
         imageAsset: 'assets/images/evening_meditation.png',
         badgeText: 'NIGHT WIND-DOWN',
-        goal: eveningGoal,
-        voiceStyle: eveningVoice,
-        backgroundSound: eveningSound,
+        goal: _pick(rng, _goals),
+        voiceStyle: _pick(rng, _voices),
+        backgroundSound: _pick(rng, _backgroundSounds),
       ),
     ];
 
     routineItems.value = items;
     dayLabel.value = dayName;
+
+    if (reshuffle) {
+      // сбрасываем прогресс на день, т.к. задания поменялись
+      unawaited(_prefs.resetRoutineProgress(date));
+    }
+  }
+
+  /// Возвращает следующую активность для запуска и сохраняет факт её открытия.
+  /// Если всё пройдено — вернёт null.
+  Future<DailyRoutineActivity?> startNextActivity({DateTime? forDate}) async {
+    final date = forDate ?? DateTime.now();
+    final items = routineItems.value;
+
+    if (items.isEmpty) return null;
+
+    final nextIndex = _prefs.getRoutineNextIndex(date);
+    if (nextIndex >= items.length) return null;
+
+    final activity = items[nextIndex];
+
+    await _prefs.addRoutineOpened(date, {
+      'index': nextIndex,
+      'title': activity.title,
+      'openedAt': DateTime.now().toIso8601String(),
+    });
+
+    await _prefs.setRoutineNextIndex(date, nextIndex + 1);
+
+    return activity;
   }
 
   Future<void> completeRoutine({DateTime? nextDay}) async {

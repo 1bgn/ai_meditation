@@ -5,6 +5,7 @@ import 'package:ai_meditation/core/ui/glass_concave_tab_bar.dart';
 import 'package:ai_meditation/core/ui/tab_bar.dart';
 import 'package:ai_meditation/features/daily_routine/domain/entities/daily_routine_activity.dart';
 import 'package:ai_meditation/features/daily_routine/presentation/pages/start_routine_page.dart';
+import 'package:ai_meditation/features/generation/domain/entities/generation_options.dart';
 import 'package:ai_meditation/features/home/presentation/widgets/action_botton.dart';
 import 'package:ai_meditation/features/home/presentation/widgets/home_meditation_card.dart';
 import 'package:ai_meditation/features/home/presentation/widgets/recomendtation_item.dart';
@@ -29,6 +30,74 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeController _controller;
+  int _selectedRecommendationTab = 0;
+  static const _recommendationPresets = <List<GenerationOptions>>[
+    // Tab 0: Sleep
+    [
+      GenerationOptions(
+        goal: 'Calm',
+        durationMinutes: 10,
+        voiceStyle: 'Warm',
+        backgroundSound: 'rain',
+      ),
+      GenerationOptions(
+        goal: 'Calm',
+        durationMinutes: 6,
+        voiceStyle: 'Soft',
+        backgroundSound: 'ambient music',
+      ),
+      GenerationOptions(
+        goal: 'Neutral',
+        durationMinutes: 8,
+        voiceStyle: 'Warm',
+        backgroundSound: 'nature',
+      ),
+    ],
+
+    // Tab 1: Stress & Anxiety
+    [
+      GenerationOptions(
+        goal: 'Stressed',
+        durationMinutes: 5,
+        voiceStyle: 'Deep',
+        backgroundSound: 'none',
+      ),
+      GenerationOptions(
+        goal: 'Anxious',
+        durationMinutes: 8,
+        voiceStyle: 'Neutral',
+        backgroundSound: 'ambient music',
+      ),
+      GenerationOptions(
+        goal: 'Stressed',
+        durationMinutes: 10,
+        voiceStyle: 'Deep',
+        backgroundSound: 'rain',
+      ),
+    ],
+
+    // Tab 2: Daily meditation
+    [
+      GenerationOptions(
+        goal: 'Neutral',
+        durationMinutes: 5,
+        voiceStyle: 'Soft',
+        backgroundSound: 'nature',
+      ),
+      GenerationOptions(
+        goal: 'Calm',
+        durationMinutes: 7,
+        voiceStyle: 'Neutral',
+        backgroundSound: 'ambient music',
+      ),
+      GenerationOptions(
+        goal: 'Neutral',
+        durationMinutes: 10,
+        voiceStyle: 'Warm',
+        backgroundSound: 'none',
+      ),
+    ],
+  ];
 
   @override
   void initState() {
@@ -289,25 +358,55 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     child: Column(
                                       children: [
-                                        HomeMeditationCard(
-                                          item: DailyRoutineMeditation(
-                                            title: "Calm",
-                                            backgroundSound: "Ambient Music",
-                                            badgeText: "CSDVCdsvs",
-                                            description:
-                                                "Take a quick meditation break",
-                                            durationMinutes: 4,
-                                            goal: "Calm",
-                                            voiceStyle: "",
-                                            imageAsset:
-                                                "assets/images/breath1.jpg",
-                                          ),
-                                          imageAsset:
-                                              "assets/images/breath1.jpg",
+                                        // Текущий item (у тебя он уже создаётся inline — вынесем в переменную)
+                                        Builder(
+                                          builder: (context) {
+                                            final item = DailyRoutineMeditation(
+                                              title: "Calm",
+                                              backgroundSound: "ambient music",
+                                              badgeText: "CSDVCdsvs",
+                                              description:
+                                                  "Take a quick meditation break",
+                                              durationMinutes: 4,
+                                              goal: "Calm",
+                                              voiceStyle: "Soft",
+                                              imageAsset:
+                                                  "assets/images/breath1.jpg",
+                                            );
+
+                                            return GestureDetector(
+                                              behavior: HitTestBehavior.opaque,
+                                              onTap: () {
+                                                final presets =
+                                                    GenerationOptions(
+                                                      goal: item.goal,
+                                                      durationMinutes:
+                                                          item.durationMinutes,
+                                                      voiceStyle:
+                                                          item.voiceStyle,
+                                                      backgroundSound:
+                                                          item.backgroundSound,
+                                                    );
+
+                                                _showBottomSheet(
+                                                  context,
+                                                  GenerationPage(
+                                                    presets: presets,
+                                                  ),
+                                                );
+                                              },
+                                              child: HomeMeditationCard(
+                                                item: item,
+                                                imageAsset:
+                                                    "assets/images/breath1.jpg",
+                                              ),
+                                            );
+                                          },
                                         ),
                                       ],
                                     ),
                                   ),
+
                                   const SizedBox(height: 24),
 
                                   Divider(
@@ -355,9 +454,25 @@ class _HomePageState extends State<HomePage> {
                                                 children: [
                                                   SizedBox(width: 16),
 
-                                                  RecomentationItem(number: 1),
-                                                  RecomentationItem(number: 2),
-                                                  RecomentationItem(number: 3),
+                                                  ...List.generate(3, (i) {
+                                                    final presets =
+                                                        _recommendationPresets[_selectedRecommendationTab][i];
+                                                    return GestureDetector(
+                                                      behavior: HitTestBehavior
+                                                          .opaque,
+                                                      onTap: () {
+                                                        _showBottomSheet(
+                                                          context,
+                                                          GenerationPage(
+                                                            presets: presets,
+                                                          ),
+                                                        );
+                                                      },
+                                                      child: RecomentationItem(
+                                                        number: i + 1,
+                                                      ),
+                                                    );
+                                                  }),
                                                 ],
                                               ),
                                             ),
@@ -382,7 +497,10 @@ class _HomePageState extends State<HomePage> {
       ),
     ),
   );
-  void onSelectRecomendation(int index) {}
+  void onSelectRecomendation(int index) {
+    print("VSDVSDVS");
+    setState(() => _selectedRecommendationTab = index);
+  }
 }
 
 void _showBottomSheet(BuildContext context, Widget child) {
