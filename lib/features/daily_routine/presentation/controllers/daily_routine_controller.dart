@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:injectable/injectable.dart';
 import 'package:signals/signals.dart';
 
@@ -16,41 +18,6 @@ class DailyRoutineController {
   final routineItems = signal<List<DailyRoutineActivity>>([]);
   final dayLabel = signal<String>('');
 
-  static const _baseTemplates = [
-    DailyRoutineMeditation(
-      title: 'Morning meditation',
-      description: 'Gentle focus + breath awareness',
-      durationMinutes: 2,
-      imageAsset: 'assets/images/morning_meditation.png',
-      badgeText: 'DAY START',
-      goal: 'relax',
-      voiceStyle: 'soft',
-      backgroundSound: 'Gentle waves',
-    ),
-    DailyRoutineBreathing(
-      title: 'Afternoon breathing',
-      description: 'Calm inhalations with steady counts',
-      durationMinutes: 4,
-      imageAsset: 'assets/images/daily_routine.svg',
-      badgeText: 'BREATH',
-      goal: 'focus',
-      voiceStyle: 'neutral',
-      backgroundSound: 'None',
-      inhaleSeconds: 4,
-      exhaleSeconds: 6,
-    ),
-    DailyRoutineMeditation(
-      title: 'Evening relaxation',
-      description: 'Slow body scan to let go',
-      durationMinutes: 3,
-      imageAsset: 'assets/images/evening_meditation.png',
-      badgeText: 'NIGHT WIND-DOWN',
-      goal: 'sleep',
-      voiceStyle: 'warm',
-      backgroundSound: 'Night forest',
-    ),
-  ];
-
   static const _weekdayNames = [
     'Monday',
     'Tuesday',
@@ -65,43 +32,121 @@ class DailyRoutineController {
     'Calm start',
     'Focus boost',
     'Gentle wind-down',
+    'Reset your mind',
+    'Slow and steady',
   ];
 
-  void refreshRoutine([DateTime? forDate]) {
+  static const _breathingMoods = ['Calm', 'Neutral', 'Stressed', 'Anxius'];
+
+  int _seedFromDate(DateTime d) {
+    // стабильный сид на день: YYYYMMDD
+    return d.year * 10000 + d.month * 100 + d.day;
+  }
+
+  T _pick<T>(Random rng, List<T> items) => items[rng.nextInt(items.length)];
+
+  int _clampDuration(int minutes) => minutes < 1 ? 1 : minutes;
+
+  ({int inhale, int exhale}) _patternForMood(String mood) {
+    switch (mood) {
+      case 'Calm':
+        return (inhale: 4, exhale: 6);
+      case 'Stressed':
+        // "прячем" hold внутри inhale/exhale блоков (UI не меняем)
+        return (inhale: 8, exhale: 8);
+      case 'Anxius':
+        // 4-7-8: inhale(4)+hold(7)=11, exhale(8)
+        return (inhale: 11, exhale: 8);
+      case 'Neutral':
+      default:
+        return (inhale: 4, exhale: 4);
+    }
+  }
+
+  void refreshRoutine([DateTime? forDate, bool reshuffle = false]) {
     final date = forDate ?? DateTime.now();
-    final variation = date.day % _baseTemplates.length;
     final dayName = _weekdayNames[date.weekday - 1];
-    final items = List.generate(_baseTemplates.length, (index) {
-      final template = _baseTemplates[index];
-      final offset = (variation + index) % 3;
-      final duration = template.durationMinutes + offset;
-      final modifier = _modifiers[(variation + index) % _modifiers.length];
-      if (template is DailyRoutineMeditation) {
-        return DailyRoutineMeditation(
-          title: template.title,
-          description: '${template.description} · $modifier',
-          durationMinutes: duration,
-          imageAsset: template.imageAsset,
-          badgeText: template.badgeText,
-          goal: template.goal,
-          voiceStyle: template.voiceStyle,
-          backgroundSound: template.backgroundSound,
-        );
-      }
-      final breathing = template as DailyRoutineBreathing;
-      return DailyRoutineBreathing(
-        title: breathing.title,
-        description: '${breathing.description} · $modifier',
-        durationMinutes: duration,
-        imageAsset: breathing.imageAsset,
-        badgeText: breathing.badgeText,
-        goal: breathing.goal,
-        voiceStyle: breathing.voiceStyle,
-        backgroundSound: breathing.backgroundSound,
-        inhaleSeconds: breathing.inhaleSeconds,
-        exhaleSeconds: breathing.exhaleSeconds,
-      );
-    });
+
+    // По умолчанию рутина стабильна для текущего дня.
+    // Если reshuffle=true — можно перегенерить новую “случайную” прямо сейчас.
+    final baseSeed = _seedFromDate(date);
+    final seed = reshuffle
+        ? (baseSeed ^ DateTime.now().millisecondsSinceEpoch)
+        : baseSeed;
+    final rng = Random(seed);
+
+    final morningDuration = _clampDuration(2 + rng.nextInt(3)); // 2..4
+    final afternoonDuration = _clampDuration(3 + rng.nextInt(4)); // 3..6
+    final eveningDuration = _clampDuration(2 + rng.nextInt(4)); // 2..5
+
+    final morningDescBase = _pick(rng, const [
+      'Gentle focus + breath awareness',
+      'Start slow and set intention',
+      'Light grounding and presence',
+    ]);
+
+    final eveningDescBase = _pick(rng, const [
+      'Slow body scan to let go',
+      'Ease tension and unwind',
+      'Quiet reflection before rest',
+    ]);
+
+    final breathingMood = _pick(rng, _breathingMoods);
+    final breathingPattern = _patternForMood(breathingMood);
+
+    final modifier1 = _pick(rng, _modifiers);
+    final modifier2 = _pick(rng, _modifiers);
+    final modifier3 = _pick(rng, _modifiers);
+
+    final items = <DailyRoutineActivity>[
+      DailyRoutineMeditation(
+        title: 'Morning meditation',
+        description: '$morningDescBase · $modifier1',
+        durationMinutes: morningDuration,
+        imageAsset: 'assets/images/morning_meditation.png',
+        badgeText: 'DAY START',
+        goal: _pick(rng, const ['relax', 'focus', 'energize']),
+        voiceStyle: _pick(rng, const ['soft', 'neutral', 'warm']),
+        backgroundSound: _pick(rng, const [
+          'Gentle waves',
+          'None',
+          'Light wind',
+        ]),
+      ),
+      DailyRoutineBreathing(
+        title: 'Afternoon breathing',
+        description:
+            '${_pick(rng, const ['Calm inhalations with steady counts', 'Reset with paced breathing', 'Slow breath to regain control'])} · $modifier2',
+        durationMinutes: afternoonDuration,
+        imageAsset: 'assets/images/daily_routine.svg',
+        // ВАЖНО: badgeText используем как mood, т.к. в DailyRoutinePage ты передаёшь badgeText в updateMood()
+        badgeText: breathingMood,
+        goal: _pick(rng, const ['relax', 'focus', 'calm']),
+        voiceStyle: _pick(rng, const ['neutral', 'soft', 'warm']),
+        backgroundSound: _pick(rng, const [
+          'None',
+          'Gentle waves',
+          'Night forest',
+        ]),
+        inhaleSeconds: breathingPattern.inhale,
+        exhaleSeconds: breathingPattern.exhale,
+      ),
+      DailyRoutineMeditation(
+        title: 'Evening relaxation',
+        description: '$eveningDescBase · $modifier3',
+        durationMinutes: eveningDuration,
+        imageAsset: 'assets/images/evening_meditation.png',
+        badgeText: 'NIGHT WIND-DOWN',
+        goal: _pick(rng, const ['sleep', 'relax', 'recover']),
+        voiceStyle: _pick(rng, const ['warm', 'soft', 'neutral']),
+        backgroundSound: _pick(rng, const [
+          'Night forest',
+          'None',
+          'Gentle waves',
+        ]),
+      ),
+    ];
+
     routineItems.value = items;
     dayLabel.value = dayName;
   }
