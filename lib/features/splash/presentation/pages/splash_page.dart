@@ -34,9 +34,6 @@ class _SplashPageState extends State<SplashPage> {
       final nextRoute = _controller.resolveNextRoute();
       if (mounted) context.go(nextRoute);
     });
-
-    // Если хочешь навигацию сразу после build, но с задержкой —
-    // лучше делать её после показа splash2 (см. выше) чтобы не было "дерганья". [web:93]
   }
 
   @override

@@ -71,6 +71,8 @@ import '../../features/onboarding/domain/usecases/complete_onboarding.dart'
     as _i561;
 import '../../features/onboarding/presentation/controllers/onboarding_controller.dart'
     as _i765;
+import '../../features/paywall/data/apphud_monetization_service.dart' as _i103;
+import '../../features/paywall/domain/monetization_service.dart' as _i971;
 import '../../features/paywall/presentation/controllers/paywall_controller.dart'
     as _i173;
 import '../../features/splash/presentation/controllers/splash_controller.dart'
@@ -94,7 +96,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i947.BreathingSessionController>(
       () => _i947.BreathingSessionController(),
     );
-    gh.factory<_i173.PaywallController>(() => _i173.PaywallController());
     gh.lazySingleton<_i752.OpenRouterRemoteDatasource>(
       () => registerModule.openRouterRemoteDatasource,
     );
@@ -108,9 +109,15 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.openRouterDio,
       instanceName: 'openRouterDio',
     );
+    gh.lazySingleton<_i971.MonetizationService>(
+      () => _i103.ApphudMonetizationService(),
+    );
     gh.lazySingleton<_i361.Dio>(
       () => registerModule.elevenLabsDio,
       instanceName: 'elevenLabsDio',
+    );
+    gh.factory<_i173.PaywallController>(
+      () => _i173.PaywallController(gh<_i971.MonetizationService>()),
     );
     gh.lazySingleton<_i632.AppPreferences>(
       () => _i632.AppPreferences(gh<_i460.SharedPreferences>()),
