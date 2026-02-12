@@ -135,7 +135,7 @@ class MeditationPlayerController {
       await _player.pause();
       await _backgroundSoundPlayer.pause();
     } else {
-      await _player.play();
+      _player.play();
       if (backgroundSound.value != 'None') {
         _backgroundSoundPlayer.play();
       }
