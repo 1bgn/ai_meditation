@@ -7,6 +7,9 @@ import 'package:apphud/models/apphud_models/apphud_product.dart';
 import 'package:apphud/models/apphud_models/composite/apphud_purchase_result.dart';
 
 abstract class MonetizationService {
+
+
+
   Future<void> init();
 
   Future<bool> hasPremiumAccess();

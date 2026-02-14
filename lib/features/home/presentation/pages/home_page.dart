@@ -9,9 +9,11 @@ import 'package:ai_meditation/features/generation/domain/entities/generation_opt
 import 'package:ai_meditation/features/home/presentation/widgets/action_botton.dart';
 import 'package:ai_meditation/features/home/presentation/widgets/home_meditation_card.dart';
 import 'package:ai_meditation/features/home/presentation/widgets/recomendtation_item.dart';
+import 'package:ai_meditation/features/paywall/presentation/controllers/paywall_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:signals_flutter/signals_flutter.dart';
 
 import '../../../../core/di/injection_container.dart';
@@ -30,6 +32,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late final HomeController _controller;
+  final paymentController = getIt<PaywallController>();
   int _selectedRecommendationTab = 0;
   static const _recommendationPresets = <List<GenerationOptions>>[
     // Tab 0: Sleep
@@ -103,6 +106,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _controller = getIt<HomeController>()..load();
+
+     paymentController.initBanner();
+
   }
 
   @override
@@ -117,6 +123,12 @@ class _HomePageState extends State<HomePage> {
             child: ListView(
               children: [
                 SizedBox(height: 32),
+                Watch((context)=> (paymentController.bannerAd.value != null)?
+              Container(
+          height: paymentController.bannerAd.value!.size.height.toDouble(),
+    width: paymentController.bannerAd.value!.size.width.toDouble(),
+    child: AdWidget(ad: paymentController.bannerAd.value!),
+  ):SizedBox(),),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [

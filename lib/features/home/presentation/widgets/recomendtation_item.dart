@@ -49,7 +49,7 @@ class RecomentationItem extends StatelessWidget {
       onTap: () async {
         if (Platform.isIOS) {
           final m = getIt<PaywallController>();
-          await m.init();
+          // await m.init();
 
           if (!m.hasPremium.value) {
             await  context.push("/paywall");

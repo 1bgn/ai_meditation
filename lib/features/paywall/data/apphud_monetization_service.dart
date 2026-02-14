@@ -12,6 +12,7 @@ import 'package:apphud/models/apphud_models/apphud_placement.dart';
 import 'package:apphud/models/apphud_models/apphud_product.dart';
 import 'package:apphud/models/apphud_models/composite/apphud_purchase_result.dart';
 import 'package:injectable/injectable.dart';
+import 'package:signals/signals.dart';
 
 import '../domain/monetization_service.dart';
 import 'apphud_listener_bridge.dart';
@@ -24,6 +25,7 @@ class ApphudMonetizationService implements MonetizationService {
 
   ApphudPaywalls? _paywallsCache;
   List<ApphudPlacement> _placementsCache = const [];
+
 
   bool _inited = false;
   bool _syncInProgress = false;
@@ -79,7 +81,9 @@ class ApphudMonetizationService implements MonetizationService {
 
 
   @override
-  Future<bool> hasPremiumAccess() => Apphud.hasPremiumAccess();
+  Future<bool> hasPremiumAccess() {
+  return  Apphud.hasPremiumAccess();
+  }
 
   @override
   Future<bool> hasActiveSubscription() => Apphud.hasActiveSubscription();
@@ -154,4 +158,6 @@ class ApphudMonetizationService implements MonetizationService {
     //   // по желанию залогируй err
     // }
   }
+
+
 }

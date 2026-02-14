@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:apphud/models/apphud_models/apphud_paywall.dart';
 import 'package:apphud/models/apphud_models/apphud_product.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:injectable/injectable.dart';
 import 'package:signals/signals.dart';
 
@@ -26,12 +29,32 @@ class PaywallController {
   // UI data built from Apphud
   final offers = signal<List<PaywallOffer>>(const []);
   final productIds = signal<List<String>>(const []);
+  final bannerAd = signal<BannerAd?>(null);
 
   final selectedIndex = signal(0);
   void select(int index) => selectedIndex.value = index;
+  Future<void> initBanner()async{
+    if (hasPremium.value) return;
 
+    BannerAd(
+      adUnitId: 'ca-app-pub-3940256099942544/6300978111',
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+
+          bannerAd.value = ad as BannerAd;
+          print("banner loaded");
+        },
+        onAdFailedToLoad: (ad, error) {
+          print('Ошибка загрузки: ${error.message}');
+          ad.dispose();
+        },
+      ),
+    ).load();
+  }
   Future<void> init() async {
-    if (isReady.value) return;
+    if (isReady.value || Platform.isAndroid) return;
 
     try {
       isBusy.value = true;

@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:ai_meditation/features/paywall/domain/monetization_service.dart';
+import 'package:ai_meditation/features/paywall/presentation/controllers/paywall_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:signals_flutter/signals_flutter.dart';
@@ -31,6 +33,8 @@ class _SplashPageState extends State<SplashPage> {
     _timer300ms = Timer(const Duration(milliseconds: 300), () async {
       _showSecond.value = true;
       await Future.delayed(Duration(milliseconds: 300));
+      final PaywallController controller = getIt();
+      await controller.init();
       final nextRoute = _controller.resolveNextRoute();
       if (mounted) context.go(nextRoute);
     });
