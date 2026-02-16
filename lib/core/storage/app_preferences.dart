@@ -12,7 +12,25 @@ class AppPreferences {
   static const _keyOnboardingCompleted = 'onboarding_completed';
   static const _keyLastMeditationTitle = 'last_meditation_title';
   static const _keyMeditationHistory = 'meditation_history';
+  static const _keyBreathingHistory = 'breathing_history';
 
+  List<Map<String, dynamic>> getBreathingHistoryRaw() {
+    final raw = _prefs.getString(_keyBreathingHistory);
+    if (raw == null || raw.isEmpty) return [];
+
+    final decoded = jsonDecode(raw);
+    if (decoded is List) {
+      // безопаснее, чем cast<Map<String,dynamic>>() напрямую
+      return decoded
+          .whereType<Map>()
+          .map((m) => m.cast<String, dynamic>())
+          .toList();
+    }
+    return [];
+  }
+
+  Future<void> setBreathingHistoryRaw(List<Map<String, dynamic>> items) =>
+      _prefs.setString(_keyBreathingHistory, jsonEncode(items));
   static const _keyRoutineSavedPrefix = 'routine_saved_'; // + YYYY-MM-DD
 
   String _routineSavedKey(DateTime d) => '$_keyRoutineSavedPrefix${_dayKey(d)}';

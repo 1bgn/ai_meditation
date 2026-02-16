@@ -56,13 +56,22 @@ class RecomentationItem extends StatelessWidget {
 
             await m.refreshStatus();
             if (!m.hasPremium.value) return;
+          }else{
+            showMyBootomSheet(
+              context,
+              height: MediaQuery.of(context).size.height * 0.9,
+              child:  BreathingSessionPage(),
+            );
           }
+        }else{
+          showMyBootomSheet(
+            context,
+            height: MediaQuery.of(context).size.height * 0.9,
+            child:  BreathingSessionPage(),
+          );
+
         }
-        showMyBootomSheet(
-          context,
-          height: MediaQuery.of(context).size.height * 0.9,
-          child:  BreathingSessionPage(),
-        );
+
       },
       child: Container(
         width: 157,

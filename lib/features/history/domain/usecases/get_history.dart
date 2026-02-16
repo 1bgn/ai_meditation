@@ -9,5 +9,7 @@ class GetHistory {
 
   final HistoryRepository _repository;
 
-  List<MeditationHistoryItem> call() => _repository.getHistory();
+  List<MeditationHistoryItem> call() {
+    return _repository.getHistory();
+  }
 }

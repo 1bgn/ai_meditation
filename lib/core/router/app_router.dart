@@ -19,11 +19,13 @@ import '../../features/generation/presentation/pages/voice_style_selection_page.
 
 import '../../features/daily_routine/presentation/models/routine_meditation_args.dart';
 
+import '../../features/history/presentation/controllers/history_controller.dart';
 import '../../features/history/presentation/pages/history_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/onboarding/presentation/pages/onboarding_page.dart';
 import '../../features/paywall/presentation/pages/paywall_page.dart';
 import '../../features/splash/presentation/pages/splash_page.dart';
+import '../di/injection_container.dart';
 
 class AppRoutes {
   static const splash = '/';
@@ -196,10 +198,12 @@ class _MainTabsShell extends StatelessWidget {
                 return GlassConcaveTabBar(
                   currentIndex: navigationShell.currentIndex,
                   icons: const [
+
                     ('assets/images/home.svg', 'Home'),
                     ('assets/images/history.svg', 'History'),
                   ],
                   onChanged: (index) {
+                    print("on change");
                     navigationShell.goBranch(
                       index,
                       initialLocation: index == navigationShell.currentIndex,

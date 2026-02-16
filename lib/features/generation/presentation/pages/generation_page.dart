@@ -12,6 +12,8 @@ import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/tts/tts_service.dart';
 import '../../../../shared/widgets/feature_error_widget.dart';
+import '../../../history/domain/entities/meditation_history_item.dart';
+import '../../../history/presentation/controllers/history_controller.dart';
 import '../../domain/entities/generation_options.dart';
 import '../controllers/generation_controller.dart';
 import 'background_sound_selection_page.dart';
@@ -44,6 +46,8 @@ class GenerationPage extends StatefulWidget {
 class _GenerationPageState extends State<GenerationPage> {
   late final GenerationController _controller;
   final _isPreparingAudio = signal(false);
+  final _historyController = getIt<HistoryController>();
+
 
   @override
   void initState() {
@@ -63,13 +67,10 @@ class _GenerationPageState extends State<GenerationPage> {
 
   Future<void> _generateAndOpenPlayer(BuildContext context) async {
     final script = await _controller.generate();
-    if (!context.mounted || script == null) {
-      return;
-    }
+    if (!context.mounted || script == null) return;
 
     final didConfirmStart = await showMyBootomSheet(
       context,
-
       height: MediaQuery.of(context).size.height * 0.88,
       child: _GeneratedMeditationSheet(
         durationMinutes: _controller.options.value.durationMinutes!,
@@ -77,9 +78,19 @@ class _GenerationPageState extends State<GenerationPage> {
         onStart: () => Navigator.of(context).pop(true),
       ),
     );
-    if (!context.mounted || didConfirmStart != true) {
-      return;
-    }
+
+    if (!context.mounted || didConfirmStart != true) return;
+
+    final options = _controller.options.value;
+
+    await _historyController.add(
+      MeditationHistoryItem(
+        title: '${options.goal} Meditation',
+        durationMinutes: options.durationMinutes!,
+        createdAt: DateTime.now(), id: '',
+        // если есть поля: voiceStyle/backgroundSound/goal — тоже положи сюда
+      ),
+    );
 
     _isPreparingAudio.value = true;
     try {
@@ -88,29 +99,30 @@ class _GenerationPageState extends State<GenerationPage> {
         language: _playerLanguage,
         pitch: 1.0,
         rate: 0.6,
-        voiceStyle: _controller.options.value.voiceStyle,
+        voiceStyle: options.voiceStyle,
       );
-      if (!context.mounted) {
-        return;
-      }
+      if (!context.mounted) return;
+
       context.push(
         AppRoutes.player,
         extra: MeditationPlayerArgs(
-          title: '${_controller.options.value.goal} Meditation',
+          title: '${options.goal} Meditation',
           script: script,
-          durationMinutes: _controller.options.value.durationMinutes!,
-          voiceStyle: _controller.options.value.voiceStyle!,
-          backgroundSound: _controller.options.value.backgroundSound!,
+          durationMinutes: options.durationMinutes!,
+          voiceStyle: options.voiceStyle!,
+          backgroundSound: options.backgroundSound!,
           preloadedSource: source.source,
           buildTTs: source,
         ),
       );
-    } catch (e) {
+    } catch (e,stacktrace) {
       _controller.error.value = e.toString();
+      print("error $e $stacktrace");
     } finally {
       _isPreparingAudio.value = false;
     }
   }
+
 
   Future<void> _showSelectionSheet(BuildContext context, Widget child) =>
       showModalBottomSheet<void>(
@@ -265,13 +277,13 @@ class _GenerationPageState extends State<GenerationPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
-                      Watch(
-                        (context) => _controller.error.value == null
-                            ? const SizedBox.shrink()
-                            : FeatureErrorWidget(
-                                error: _controller.error.value!,
-                              ),
-                      ),
+                      // Watch(
+                      //   (context) => _controller.error.value == null
+                      //       ? const SizedBox.shrink()
+                      //       : FeatureErrorWidget(
+                      //           error: _controller.error.value!,
+                      //         ),
+                      // ),
                       const Spacer(),
                       const SizedBox(height: 24),
                       SafeArea(

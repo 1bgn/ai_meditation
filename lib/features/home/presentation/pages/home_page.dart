@@ -20,6 +20,8 @@ import '../../../../core/di/injection_container.dart';
 import '../../../breathing/presentation/pages/breathing_page.dart';
 import '../../../generation/presentation/pages/generation_page.dart';
 import '../../../daily_routine/presentation/pages/daily_routine_page.dart';
+import '../../../history/domain/entities/meditation_history_item.dart';
+import '../../../history/presentation/controllers/history_controller.dart';
 import '../controllers/home_controller.dart';
 import '../widgets/recommendation_card.dart';
 
@@ -275,11 +277,13 @@ class _HomePageState extends State<HomePage> {
                                                     ActionButtonPosition.top,
                                                 iconAsset:
                                                     'assets/images/generate_mediation.svg',
-                                                onPressed: () =>
-                                                    _showBottomSheet(
+                                                onPressed: () async {
+
+                                                  _showBottomSheet(
                                                       context,
                                                       const GenerationPage(),
-                                                    ),
+                                                    );
+                                                },
                                               ),
                                             ),
                                           ],
@@ -510,7 +514,6 @@ class _HomePageState extends State<HomePage> {
     ),
   );
   void onSelectRecomendation(int index) {
-    print("VSDVSDVS");
     setState(() => _selectedRecommendationTab = index);
   }
 }

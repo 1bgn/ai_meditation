@@ -9,6 +9,7 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/ui/concave_circle_button.dart';
 import '../../domain/entities/meditation_history_item.dart';
+import '../controllers/breathing_history_controller.dart';
 import '../controllers/history_controller.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -34,6 +35,18 @@ class _HistoryPageState extends State<HistoryPage> {
   void initState() {
     super.initState();
     _meditationsController = getIt<HistoryController>()..load();
+
+    // // Если хочешь проверить, что Watch реально реагирует:
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   _meditationsController.add(
+    //     MeditationHistoryItem(
+    //       id: 'test',
+    //       title: 'Test',
+    //       durationMinutes: 4,
+    //       createdAt: DateTime.now(),
+    //     ),
+    //   );
+    // });
   }
 
   @override
@@ -46,11 +59,10 @@ class _HistoryPageState extends State<HistoryPage> {
           children: [
             Positioned.fill(
               child: Image.asset(
-                "assets/images/home_bg.png",
+                'assets/images/home_bg.png',
                 fit: BoxFit.cover,
               ),
             ),
-
             Column(
               children: [
                 const SizedBox(height: 16),
@@ -61,7 +73,6 @@ class _HistoryPageState extends State<HistoryPage> {
                   onRepeat: () {},
                 ),
                 const SizedBox(height: 16),
-
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 0),
@@ -83,7 +94,7 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 }
 
-class _HistoryGlassBody extends StatelessWidget {
+class _HistoryGlassBody extends StatefulWidget {
   const _HistoryGlassBody({
     required this.tabIndex,
     required this.onTabChanged,
@@ -98,6 +109,19 @@ class _HistoryGlassBody extends StatelessWidget {
   final HistoryController meditationsController;
   final List<String> meditationImages;
   final List<_BreathingHistoryUiItem> breathingItems;
+
+  @override
+  State<_HistoryGlassBody> createState() => _HistoryGlassBodyState();
+}
+
+class _HistoryGlassBodyState extends State<_HistoryGlassBody> {
+  late final BreathingHistoryController _breathingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _breathingController = getIt<BreathingHistoryController>()..load();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,13 +152,12 @@ class _HistoryGlassBody extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(2),
                   child: Image.asset(
-                    "assets/images/home_bg.png",
+                    'assets/images/home_bg.png',
                     fit: BoxFit.cover,
                     opacity: const AlwaysStoppedAnimation(.68),
                   ),
                 ),
               ),
-
               Positioned.fill(
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -144,25 +167,25 @@ class _HistoryGlassBody extends StatelessWidget {
                         children: [
                           Expanded(
                             child: MyTabBarFill(
-                              selectedIndex: tabIndex,
-                              tabs: [
+                              selectedIndex: widget.tabIndex,
+                              tabs:  [
                                 TabItem(title: 'Meditations'),
                                 TabItem(title: 'Breathing'),
                               ],
-                              onTap: onTabChanged,
+                              onTap: widget.onTabChanged,
                             ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 16),
-
                       Expanded(
                         child: IndexedStack(
-                          index: tabIndex,
+                          index: widget.tabIndex,
                           children: [
                             // Meditations
                             Watch((context) {
-                              final items = meditationsController.items.value;
+                              final items =
+                                  widget.meditationsController.items.value;
 
                               if (items.isEmpty) {
                                 return const Center(
@@ -175,55 +198,58 @@ class _HistoryGlassBody extends StatelessWidget {
                                 padding: const EdgeInsets.only(bottom: 24),
                                 itemCount: items.length,
                                 separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 18),
+                                const SizedBox(height: 18),
                                 itemBuilder: (context, index) {
                                   final item = items[index];
-                                  final image =
-                                      meditationImages[index %
-                                          meditationImages.length];
+                                  final image = widget.meditationImages[
+                                  index % widget.meditationImages.length];
 
                                   return _MeditationCard(
                                     item: item,
                                     imageAsset: image,
+                                    onDelete: () =>
+                                        widget.meditationsController
+                                            .delete(item),
                                   );
                                 },
                               );
                             }),
 
                             // Breathing
-                            Builder(
-                              builder: (context) {
-                                if (breathingItems.isEmpty) {
-                                  return const Center(
-                                    child: Text('No breathing history yet.'),
-                                  );
-                                }
-
-                                return ListView.separated(
-                                  physics: const BouncingScrollPhysics(),
-                                  padding: const EdgeInsets.only(bottom: 24),
-                                  itemCount: breathingItems.length,
-                                  separatorBuilder: (_, __) =>
-                                      const SizedBox(height: 18),
-                                  itemBuilder: (context, index) {
-                                    final item = breathingItems[index];
-                                    return _BreathingCard(
-                                      item: item,
-                                      imageAsset:
-                                          'assets/images/daily_routine.svg',
-                                      color: const Color.fromRGBO(
-                                        119,
-                                        201,
-                                        126,
-                                        0.16,
-                                      ),
-                                      durationLabel:
-                                          '${item.durationMinutes} min',
-                                    );
-                                  },
+                            Watch((context) {
+                              final items = _breathingController.items.value;
+                              if (items.isEmpty) {
+                                return const Center(
+                                  child: Text('No breathing history yet.'),
                                 );
-                              },
-                            ),
+                              }
+
+                              return ListView.separated(
+                                physics: const BouncingScrollPhysics(),
+                                padding: const EdgeInsets.only(bottom: 24),
+                                itemCount: items.length,
+                                separatorBuilder: (_, __) =>
+                                const SizedBox(height: 18),
+                                itemBuilder: (context, index) {
+                                  final item = items[index];
+                                  return _BreathingCard(
+                                    item: _BreathingHistoryUiItem(
+                                      title: item.title,
+                                      durationMinutes: item.durationMinutes,
+                                      inhaleSeconds: item.inhaleSeconds,
+                                      exhaleSeconds: item.exhaleSeconds,
+                                      moodLabel: item.moodLabel,
+                                    ),
+                                    imageAsset:
+                                    'assets/images/daily_routine.svg',
+                                    color: const Color.fromRGBO(
+                                        119, 201, 126, 0.16),
+                                    durationLabel:
+                                    '${item.durationMinutes} min',
+                                  );
+                                },
+                              );
+                            }),
                           ],
                         ),
                       ),
@@ -267,7 +293,6 @@ class _MeditationCard extends StatelessWidget {
           ),
           child: Stack(
             children: [
-              // Чтобы контент не залезал под иконку справа сверху
               Padding(
                 padding: const EdgeInsets.only(right: 28),
                 child: Row(
@@ -368,17 +393,16 @@ class _MeditationCard extends StatelessWidget {
                             ),
                             decoration: const BoxDecoration(
                               color: Color.fromRGBO(119, 201, 126, 0.08),
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(100),
-                              ),
+                              borderRadius:
+                              BorderRadius.all(Radius.circular(100)),
                             ),
                             child: Wrap(
                               direction: Axis.horizontal,
                               children: [
-                                SvgPicture.asset("assets/images/mat.svg"),
+                                SvgPicture.asset('assets/images/mat.svg'),
                                 const SizedBox(width: 6),
                                 Text(
-                                  "Daily Routine".toUpperCase(),
+                                  'Daily Routine'.toUpperCase(),
                                   style: GoogleFonts.funnelDisplay(
                                     fontSize: 14,
                                     height: 20 / 14,
@@ -401,7 +425,6 @@ class _MeditationCard extends StatelessWidget {
                   ],
                 ),
               ),
-
               Positioned(
                 top: 0,
                 right: 0,
@@ -579,43 +602,45 @@ class _HistoryHeader extends StatelessWidget {
   final VoidCallback onRepeat;
 
   @override
-  Widget build(BuildContext context) => SizedBox(
-    height: 58,
-    child: Stack(
-      children: [
-        Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.only(top: 24),
-            child: Text(
-              title.toUpperCase(),
-              style: GoogleFonts.funnelDisplay(
-                fontSize: 16,
-                height: 24 / 16,
-                fontWeight: FontWeight.w600,
-                letterSpacing: -0.5,
-                color: Colors.black,
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 58,
+      child: Stack(
+        children: [
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 24),
+              child: Text(
+                title.toUpperCase(),
+                style: GoogleFonts.funnelDisplay(
+                  fontSize: 16,
+                  height: 24 / 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: -0.5,
+                  color: Colors.black,
+                ),
               ),
             ),
           ),
-        ),
-        Positioned(
-          top: 18,
-          right: 23,
-          child: Wrap(
-            direction: Axis.horizontal,
-            children: [
-              ConcaveCircleButton(
-                onPressed: onLike,
-                iconColor: Colors.grey,
-                svgAssetPath: 'assets/images/like.svg',
-                size: 40,
-                iconSize: 20,
-              ),
-            ],
+          Positioned(
+            top: 18,
+            right: 23,
+            child: Wrap(
+              direction: Axis.horizontal,
+              children: [
+                ConcaveCircleButton(
+                  onPressed: onLike,
+                  iconColor: Colors.grey,
+                  svgAssetPath: 'assets/images/like.svg',
+                  size: 40,
+                  iconSize: 20,
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
-    ),
-  );
+        ],
+      ),
+    );
+  }
 }

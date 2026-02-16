@@ -14,6 +14,8 @@ class HistoryRepositoryImpl implements HistoryRepository {
   List<MeditationHistoryItem> getHistory() => _local.getHistory();
 
   @override
-  Future<void> addHistoryItem(MeditationHistoryItem item) =>
-      _local.addHistoryItem(item);
+  Future<void> addHistoryItem(MeditationHistoryItem item) => _local.addHistoryItem(item);
+
+  @override
+  Future<void> deleteHistoryItem(MeditationHistoryItem item) => _local.deleteHistoryItem(item);
 }

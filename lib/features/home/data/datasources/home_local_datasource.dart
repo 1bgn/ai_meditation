@@ -3,7 +3,7 @@ import 'package:injectable/injectable.dart';
 import '../../../../core/storage/app_preferences.dart';
 import '../../domain/entities/meditation_recommendation.dart';
 
-@lazySingleton
+@Injectable()
 class HomeLocalDatasource {
   HomeLocalDatasource(this._preferences);
 

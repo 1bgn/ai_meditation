@@ -16,9 +16,13 @@ class HistoryLocalDatasource {
 
   Future<void> addHistoryItem(MeditationHistoryItem item) async {
     final items = getHistory()..insert(0, item);
-    await _preferences.setMeditationHistoryRaw(
-      items.map((e) => e.toJson()).toList(),
-    );
+    await _preferences.setMeditationHistoryRaw(items.map((e) => e.toJson()).toList());
     await _preferences.setLastMeditationTitle(item.title);
+  }
+
+  Future<void> deleteHistoryItem(MeditationHistoryItem item) async {
+    final items = getHistory()
+      ..removeWhere((e) => e.createdAt == item.createdAt); // или e.id == item.id
+    await _preferences.setMeditationHistoryRaw(items.map((e) => e.toJson()).toList());
   }
 }

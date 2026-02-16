@@ -40,14 +40,28 @@ import '../../features/generation/presentation/controllers/generation_controller
     as _i145;
 import '../../features/generation/presentation/controllers/meditation_player_controller.dart'
     as _i1060;
+import '../../features/history/data/datasources/breathing_history_datasource.dart'
+    as _i853;
 import '../../features/history/data/datasources/history_local_datasource.dart'
     as _i665;
+import '../../features/history/data/repositories/breathing_history_impl.dart'
+    as _i706;
 import '../../features/history/data/repositories/history_repository_impl.dart'
     as _i751;
+import '../../features/history/domain/repositories/breathing_history_repository.dart'
+    as _i61;
 import '../../features/history/domain/repositories/history_repository.dart'
     as _i142;
+import '../../features/history/domain/usecases/add_breathing_history_item.dart'
+    as _i165;
 import '../../features/history/domain/usecases/add_history_item.dart' as _i305;
+import '../../features/history/domain/usecases/delete_history_item.dart'
+    as _i391;
+import '../../features/history/domain/usecases/get_breathing_history.dart'
+    as _i307;
 import '../../features/history/domain/usecases/get_history.dart' as _i886;
+import '../../features/history/presentation/controllers/breathing_history_controller.dart'
+    as _i508;
 import '../../features/history/presentation/controllers/history_controller.dart'
     as _i712;
 import '../../features/home/data/datasources/home_local_datasource.dart'
@@ -146,11 +160,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1060.MeditationPlayerController>(
       () => _i1060.MeditationPlayerController(gh<_i369.TtsService>()),
     );
+    gh.factory<_i314.HomeLocalDatasource>(
+      () => _i314.HomeLocalDatasource(gh<_i632.AppPreferences>()),
+    );
+    gh.lazySingleton<_i853.BreathingHistoryLocalDatasource>(
+      () => _i853.BreathingHistoryLocalDatasource(gh<_i632.AppPreferences>()),
+    );
     gh.lazySingleton<_i665.HistoryLocalDatasource>(
       () => _i665.HistoryLocalDatasource(gh<_i632.AppPreferences>()),
-    );
-    gh.lazySingleton<_i314.HomeLocalDatasource>(
-      () => _i314.HomeLocalDatasource(gh<_i632.AppPreferences>()),
     );
     gh.lazySingleton<_i804.OnboardingLocalDatasource>(
       () => _i804.OnboardingLocalDatasource(gh<_i632.AppPreferences>()),
@@ -171,8 +188,13 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i765.OnboardingController>(
       () => _i765.OnboardingController(gh<_i561.CompleteOnboarding>()),
     );
-    gh.lazySingleton<_i0.HomeRepository>(
+    gh.factory<_i0.HomeRepository>(
       () => _i76.HomeRepositoryImpl(gh<_i314.HomeLocalDatasource>()),
+    );
+    gh.lazySingleton<_i61.BreathingHistoryRepository>(
+      () => _i706.BreathingHistoryRepositoryImpl(
+        gh<_i853.BreathingHistoryLocalDatasource>(),
+      ),
     );
     gh.lazySingleton<_i142.HistoryRepository>(
       () => _i751.HistoryRepositoryImpl(gh<_i665.HistoryLocalDatasource>()),
@@ -183,20 +205,33 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i655.GetRecommendations>(
       () => _i655.GetRecommendations(gh<_i0.HomeRepository>()),
     );
+    gh.factory<_i165.AddBreathingHistoryItem>(
+      () =>
+          _i165.AddBreathingHistoryItem(gh<_i61.BreathingHistoryRepository>()),
+    );
+    gh.factory<_i307.GetBreathingHistory>(
+      () => _i307.GetBreathingHistory(gh<_i61.BreathingHistoryRepository>()),
+    );
+    gh.factory<_i508.BreathingHistoryController>(
+      () => _i508.BreathingHistoryController(
+        gh<_i307.GetBreathingHistory>(),
+        gh<_i165.AddBreathingHistoryItem>(),
+      ),
+    );
     gh.factory<_i305.AddHistoryItem>(
       () => _i305.AddHistoryItem(gh<_i142.HistoryRepository>()),
     );
     gh.factory<_i886.GetHistory>(
       () => _i886.GetHistory(gh<_i142.HistoryRepository>()),
     );
+    gh.factory<_i391.DeleteHistoryItem>(
+      () => _i391.DeleteHistoryItem(gh<_i142.HistoryRepository>()),
+    );
     gh.factory<_i414.HomeController>(
       () => _i414.HomeController(
         gh<_i655.GetRecommendations>(),
         gh<_i108.GetLastMeditation>(),
       ),
-    );
-    gh.factory<_i712.HistoryController>(
-      () => _i712.HistoryController(gh<_i886.GetHistory>()),
     );
     gh.factory<_i951.DailyRoutineController>(
       () => _i951.DailyRoutineController(
@@ -209,6 +244,13 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i15.GetGenerationOptions>(),
         gh<_i934.SaveGenerationOptions>(),
         gh<_i899.GenerateMeditation>(),
+        gh<_i305.AddHistoryItem>(),
+      ),
+    );
+    gh.lazySingleton<_i712.HistoryController>(
+      () => _i712.HistoryController(
+        gh<_i886.GetHistory>(),
+        gh<_i391.DeleteHistoryItem>(),
         gh<_i305.AddHistoryItem>(),
       ),
     );

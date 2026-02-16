@@ -9,6 +9,10 @@ import 'package:signals_flutter/signals_flutter.dart';
 import '../../../../core/di/injection_container.dart';
 import '../../../../core/router/app_router.dart';
 import '../../../../core/ui/concave_circle_button.dart';
+import '../../../history/domain/entities/breathing_history_item.dart';
+import '../../../history/domain/entities/meditation_history_item.dart';
+import '../../../history/presentation/controllers/breathing_history_controller.dart';
+import '../../../history/presentation/controllers/history_controller.dart';
 import '../../domain/entities/breathing_options.dart';
 import '../controllers/breathing_controller.dart';
 import 'duration_selection_page.dart';
@@ -24,6 +28,7 @@ class BreathingPage extends StatefulWidget {
 class _BreathingPageState extends State<BreathingPage> {
   late final BreathingController _controller;
 
+  final _breathingHistoryController = getIt<BreathingHistoryController>();
   @override
   void initState() {
     super.initState();
@@ -203,13 +208,29 @@ class _BreathingPageState extends State<BreathingPage> {
                                         null,
                                 label: 'START SESSION',
                                 onComplete: () async {
-                                  context.push(AppRoutes.breathingSession).then(
-                                    (v) {
-                                      if (v != null && v == true) {
-                                        _showCongratsSheet(context);
-                                      }
-                                    },
-                                  );
+                                  final result = await context.push<bool>(AppRoutes.breathingSession);
+
+                                  if (!context.mounted) return;
+
+                                  if (result == true) {
+                                    final now = DateTime.now();
+                                    final options = _controller.options.value;
+
+                                    await _breathingHistoryController.add(
+                                      BreathingHistoryItem(
+                                        id: now.microsecondsSinceEpoch.toString(), // простой уникальный id [web:87]
+                                        title: 'Breathing session',
+                                        durationMinutes: options.durationMinutes!, // enabled гарантирует non-null
+                                        inhaleSeconds: 4, // подставь реальные значения твоего упражнения
+                                        exhaleSeconds: 6,
+                                        moodLabel: options.mood!,
+                                        createdAt: now,
+                                      ),
+                                    );
+
+                                    await _showCongratsSheet(context);
+                                  }
+
                                 },
                               ),
                             ),
